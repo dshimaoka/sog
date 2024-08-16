@@ -98,7 +98,7 @@ stopLog(c.myStim.prms.n_ori_repeats_completed);
 rsvp =design('rsvp');           % Define a factorial with one factor
 %rsvp.fac1.myStim.orientation = args.ori1List; % Assign orientations
 rsvp.fac1.myStim.contrast = [1]; %dummy factorization
-rsvp.conditions(:).myStim.orientation = plugins.set_orientation(c); %plugins.jitter(c,{g},'distribution',@set_orientation);
+rsvp.conditions(:).myStim.orientation =plugins.jitter(c,{g},'distribution',@set_orientation);
 %rsvp.fac1.myStim.orientation = plugins.jitter(c,{g},'distribution',@set_orientation);
 rsvp.randomization = 'RANDOMWITHOUTREPLACEMENT'; % Randomize
 g.addRSVP(rsvp,'duration', args.onFrames*1000/c.screen.frameRate, ...
