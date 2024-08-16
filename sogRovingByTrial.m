@@ -70,13 +70,13 @@ g=stimuli.gabor(c,'patch');
 g.addProperty('tDur', 0); %duration of one successive presentations [ms]
 g.addProperty('frameRate', c.screen.frameRate);
 g.addProperty('direction',0);
-g.addProperty('directionPolarity',0);
+%g.addProperty('directionPolarity',0);
 g.addProperty('speed',args.speed);
 
 tDurChoices =  tDur_cycle*args.nSuccessivePresentations(1):tDur_cycle:tDur_cycle*args.nSuccessivePresentations(2);
 g.tDur = plugins.jitter(c,num2cell(tDurChoices), 'distribution','1ofN');
 
-g.color             = [redLuminance 1 1 1]; %TOBE FIXED
+g.color             = [redLuminance 0 1 1]; 
 g.contrast          = 1;
 g.Y                 = 0;
 g.X                 = 0;
@@ -85,10 +85,9 @@ g.flickerMode = 'sinecontrast';%'none'; %none makes the phase difference between
 g.flickerFrequency = 0;
 g.orientation = 0;
 g.phase = 0;
-g.orientation = '@patch.direction';%'@mod(patch.direction, 180) - 90';
-g.directionPolarity = 1;%'@-2*fix(patch.direction/180) + 1';
-g.phaseSpeed = '@360*patch.directionPolarity * patch.speed * patch.frequency /patch.frameRate'; %[deg/frame]
-% g.phaseSpeed        = 0;
+g.orientation = '@patch.direction-90';%'@mod(patch.direction, 180) - 90'; %TOBE FIXED
+%g.directionPolarity = 1;%'@-2*fix(patch.direction/180) + 1'; %TOBE FIXED
+g.phaseSpeed = '@360*patch.speed * patch.frequency /patch.frameRate'; %[deg/frame]
 g.mask              ='CIRCLE';
 g.frequency         = frequency;
 g.on                =  0;%'@fixbhv.startTime.FIXATING +cic.fixDuration'; % Start showing fixDuration [ms] after the subject starts fixating (See 'fixation' object below).
