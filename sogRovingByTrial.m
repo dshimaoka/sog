@@ -49,10 +49,7 @@ redLuminance = 171/255; %Fraser ... Miller 2023
 %% Prerequisites.
 import neurostim.*
 
-if ~args.debug % log git hash
-    hash = marmolab.getGitHash(fileparts(mfilename('fullpath')));
-    c.githash('sog.git') = hash;
-end
+
 
 %% Setup CIC and the stimuli.
 c = marmolab.rigcfg('debug',args.debug, p.Unmatched); % set to false to save githash at start of each experiment!
@@ -62,6 +59,11 @@ c.trialDuration = '@patch.tDur'; %'@fixbhv.startTime.FIXATING+patch.tDur';
 c.screen.color.background = [0 0 0];
 tDur_cycle = (args.onFrames + args.offFrames)*1000/c.screen.frameRate; %one presentation cycle [ms]
 c.iti = 0;%tDur_cycle;
+
+if ~args.debug % log git hash
+    hash = marmolab.getGitHash(fileparts(mfilename('fullpath')));
+    c.githash('sog.git') = hash;
+end
 
 % Create a Gabor stimulus.
 g=stimuli.gabor(c,'patch');
@@ -93,8 +95,8 @@ g.on                =  0;%'@fixbhv.startTime.FIXATING +cic.fixDuration'; % Start
 
 
 % define the sampling function
-    function val = set_orientation(ori_list)
-          val = randsample(ori_list, 1);
+    function val = set_direction(dir_list)
+          val = randsample(dir_list, 1);
     end
 
 
@@ -103,7 +105,7 @@ g.on                =  0;%'@fixbhv.startTime.FIXATING +cic.fixDuration'; % Start
 rsvp =design('rsvp');           % Define a factorial with one factor
 %rsvp.fac1.patch.orientation = args.ori1List; % OK
 rsvp.fac1.patch.contrast = g.contrast; %dummy factorization
-rsvp.conditions(:).patch.orientation =plugins.jitter(c,{args.ori1List},'distribution',@set_orientation);
+rsvp.conditions(:).patch.direction =plugins.jitter(c,{args.dirList},'distribution',@set_direction);
 rsvp.randomization = 'RANDOMWITHOUTREPLACEMENT'; % Randomize
 g.addRSVP(rsvp,'duration', args.onFrames*1000/c.screen.frameRate, ...
     'isi', args.offFrames*1000/c.screen.frameRate); % Tell the stimulus that it should run this rsvp (in every trial). 5 frames on 2 frames off.
