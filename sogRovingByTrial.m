@@ -11,6 +11,12 @@ function sogRovingByTrial(subject, varargin)
 %
 % created from sogDemo
 
+% TODO: 
+% control sequence 
+% turn off logging
+% impose fixation only in the 1st trial?
+% shorten iti as much as possible
+
 %% PARAMETER DEFINITIONS
 
 if ~exist('subject','var')
@@ -18,6 +24,7 @@ if ~exist('subject','var')
 end
 
 validateattributes(subject,{'char'},{'nonempty'},'','subject',1);
+
 % parse optional arguments...
 p = inputParser();
 p.KeepUnmatched = true;
@@ -48,8 +55,7 @@ redLuminance = 171/255; %Fraser ... Miller 2023
 
 %% Prerequisites.
 import neurostim.*
-
-
+commandwindow;
 
 %% Setup CIC and the stimuli.
 c = marmolab.rigcfg('debug',args.debug, p.Unmatched); % set to false to save githash at start of each experiment!
@@ -110,6 +116,7 @@ rsvp.randomization = 'RANDOMWITHOUTREPLACEMENT'; % Randomize
 g.addRSVP(rsvp,'duration', args.onFrames*1000/c.screen.frameRate, ...
     'isi', args.offFrames*1000/c.screen.frameRate); % Tell the stimulus that it should run this rsvp (in every trial). 5 frames on 2 frames off.
 
+%% Turn off logging
 
 
 
