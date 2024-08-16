@@ -76,16 +76,17 @@ g.addProperty('speed',args.speed);
 tDurChoices =  tDur_cycle*args.nSuccessivePresentations(1):tDur_cycle:tDur_cycle*args.nSuccessivePresentations(2);
 g.tDur = plugins.jitter(c,num2cell(tDurChoices), 'distribution','1ofN');
 
-g.color             = [redLuminance 0 1 1]; 
+g.color             = 0.5*[redLuminance 0 1 1]; 
 g.contrast          = 1;
 g.Y                 = 0;
 g.X                 = 0;
+g.width = 2*args.radius;
+g.height = g.width;
 g.sigma             = args.radius;
 g.flickerMode = 'sinecontrast';%'none'; %none makes the phase difference between patches more apparent
 g.flickerFrequency = 0;
-g.orientation = 0;
 g.phase = 0;
-g.orientation = '@patch.direction-90';%'@mod(patch.direction, 180) - 90'; %TOBE FIXED
+g.orientation = '@patch.direction-90';
 %g.directionPolarity = 1;%'@-2*fix(patch.direction/180) + 1'; %TOBE FIXED
 g.phaseSpeed = '@360*patch.speed * patch.frequency /patch.frameRate'; %[deg/frame]
 g.mask              ='CIRCLE';
