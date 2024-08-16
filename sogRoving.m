@@ -80,21 +80,26 @@ stopLog(c.myStim.prms.n_ori_repeats_completed);
     function val = set_orientation(o)
 
         if o.n_ori_repeats_completed == o.n_ori_repeats
-            o.n_ori_repeats = random("uniform", 4, 10);
-            val = random("uniform", 0,359);
+            o.n_ori_repeats = unidrnd(5);%random("uniform", 3, 4);
+            val = unidrnd(359);%random("uniform", 0,359);
             o.n_ori_repeats_completed = 1;
         else
             val = o.orientation;
             o.n_ori_repeats_completed = n_ori_repeats_completed + 1;
         end
+
+        disp(num2str([o.n_ori_repeats o.n_ori_repeats_completed]))
+
     end
 
 
 % We want to show a rapid rsvp of gratings. Use the factorial class to
 % define these "conditions" in the rsvp.
 rsvp =design('rsvp');           % Define a factorial with one factor
-rsvp.fac1.myStim.orientation = plugins.jitter(c,{g},'distribution',@set_orientation);
 %rsvp.fac1.myStim.orientation = args.ori1List; % Assign orientations
+rsvp.fac1.myStim.contrast = [1]; %dummy factorization
+rsvp.conditions(:).myStim.orientation = plugins.set_orientation(c); %plugins.jitter(c,{g},'distribution',@set_orientation);
+%rsvp.fac1.myStim.orientation = plugins.jitter(c,{g},'distribution',@set_orientation);
 rsvp.randomization = 'RANDOMWITHOUTREPLACEMENT'; % Randomize
 g.addRSVP(rsvp,'duration', args.onFrames*1000/c.screen.frameRate, ...
     'isi', args.offFrames*1000/c.screen.frameRate); % Tell the stimulus that it should run this rsvp (in every trial). 5 frames on 2 frames off.
