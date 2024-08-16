@@ -1,4 +1,4 @@
-function sogRoving(subject, varargin)
+function sogRandom(subject, varargin)
 %% 
 % Stream of Gratings Example
 % 

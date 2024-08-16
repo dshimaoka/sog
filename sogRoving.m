@@ -80,15 +80,15 @@ stopLog(c.myStim.prms.n_ori_repeats_completed);
     function val = set_orientation(o)
 
         if o.n_ori_repeats_completed == o.n_ori_repeats
-            o.n_ori_repeats = unidrnd(5);%random("uniform", 3, 4);
+            o.n_ori_repeats = 2+unidrnd(5);%random("uniform", 3, 4);
             val = unidrnd(359);%random("uniform", 0,359);
             o.n_ori_repeats_completed = 1;
         else
             val = o.orientation;
-            o.n_ori_repeats_completed = n_ori_repeats_completed + 1;
+            o.n_ori_repeats_completed = o.n_ori_repeats_completed + 1;
         end
 
-        disp(num2str([o.n_ori_repeats o.n_ori_repeats_completed]))
+        disp(['set_orientation: ' num2str([o.n_ori_repeats o.n_ori_repeats_completed])])
 
     end
 
@@ -96,8 +96,8 @@ stopLog(c.myStim.prms.n_ori_repeats_completed);
 % We want to show a rapid rsvp of gratings. Use the factorial class to
 % define these "conditions" in the rsvp.
 rsvp =design('rsvp');           % Define a factorial with one factor
-%rsvp.fac1.myStim.orientation = args.ori1List; % Assign orientations
-rsvp.fac1.myStim.contrast = [1]; %dummy factorization
+rsvp.fac1.myStim.orientation = [0 90];%args.ori1List; % Assign orientations
+%rsvp.fac1.myStim.contrast = [1]; %dummy factorization
 rsvp.conditions(:).myStim.orientation =plugins.jitter(c,{g},'distribution',@set_orientation);
 %rsvp.fac1.myStim.orientation = plugins.jitter(c,{g},'distribution',@set_orientation);
 rsvp.randomization = 'RANDOMWITHOUTREPLACEMENT'; % Randomize
@@ -150,7 +150,8 @@ fix.tolerance       = radius_init;
 d=design('dummy');           % Define a factorial with one factor
 % Nothing to vary here but we need at least one condition
 d.conditions(1).myStim.X = 0; % Dummy
-blck=block('block',d);                  % Define a block based on this factorial
+
+blck=block('block',rsvp);                  % Define a block based on this factorial
 blck.nrRepeats  = args.nRepPerCond;                        % Each condition is repeated this many times
 
 %% Run the experiment
