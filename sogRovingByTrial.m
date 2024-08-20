@@ -78,7 +78,6 @@ end
 dirList = args.dirList;
 nrConds = numel(args.dirList);
 g = cell(nrConds,1);
-%rsvp = cell(nrConds,1);
 for ii = 1:nrConds
     stimName = ['patch' num2str(ii)];
     g{ii} = neurostim.stimuli.gabor(c,stimName); % neurostim.stimuli.gabor
@@ -125,6 +124,44 @@ for ii = 1:nrConds
     g{ii}.addRSVP(rsvp,'duration', args.onFrames*1000/c.screen.frameRate, ...
         'isi', args.offFrames*1000/c.screen.frameRate); % Tell the stimulus that it should run this rsvp (in every trial). 5 frames on 2 frames off.
 end
+
+%% equiprobable control condition
+    g0 = neurostim.stimuli.gabor(c,'patch0'); % neurostim.stimuli.gabor
+    thisDirection = dirList(ii);
+
+    g0.addProperty('tDur', 0); %duration of one successive presentations [ms]
+    g0.addProperty('frameRate', c.screen.frameRate);
+    g0.addProperty('direction',0);
+    g0.addProperty('directionPolarity',0);
+    g0.addProperty('speed',args.speed);
+
+    tDurChoices =  tDur_cycle*args.nSuccessivePresentations(1):tDur_cycle:tDur_cycle*args.nSuccessivePresentations(2);
+    g0.tDur = plugins.jitter(c,num2cell(tDurChoices), 'distribution','1ofN');
+
+    g0.color             = 0.5*[redLuminance 0 1 1];
+    g0.contrast          = 1;
+    g0.Y                 = 0;
+    g0.X                 = 0;
+    g0.width = 2*args.radius;
+    g0.height = g0.width;
+    g0.sigma             = args.radius;
+    g0.flickerMode = 'sinecontrast';%'none'; %none makes the phase difference between patches more apparent
+    g0.flickerFrequency = 0;
+    g0.phase = 0;
+    g0.orientation = '@mod(patch0.direction, 180) - 90'; %NG
+    g0.directionPolarity = '@-2*fix(patch0.direction/180) + 1'; %NG
+    g0.phaseSpeed = '@360*patch0.directionPolarity * patch0.speed * patch0.frequency /patch0.frameRate'; %[deg/frame]
+    g0.mask              = 'CIRCLE';
+    g0.frequency         = frequency;
+    g0.on                =  0;
+
+    rsvp =design('rsvp');           % Define a factorial with one factor
+    rsvp.fac1.(sprintf('%s',stimName)).direction = args.dirList; % OK
+    rsvp.fac1.(sprintf('%s',stimName)).contrast = g0.contrast; %dummy factorization
+    rsvp.randomization = 'RANDOMWITHOUTREPLACEMENT'; % Randomize
+    g0.addRSVP(rsvp,'duration', args.onFrames*1000/c.screen.frameRate, ...
+        'isi', args.offFrames*1000/c.screen.frameRate); % Tell the stimulus that it should run this rsvp (in every trial). 5 frames on 2 frames off.
+
 
 %% "fixate" for reward...
 marmolab.behaviors.fixate(c,'fix');
@@ -176,8 +213,14 @@ end
 blck=block('block', myDesign);%rsvp);                  % Define a block based on this factorial
 blck.nrRepeats  = args.nRep;                        % Each condition is repeated this many times
 
+myDesign_ctrl = design('control');
+myDesign_ctrl.fac1.patch0.contrast = 1; %fake
+
+blck2 = block('control', myDesign_ctrl);
+blck2.nrRepeats  = args.nRep*nrConds;
+
 %% Run the experiment
 %c.cursor = 'arrow';
 % Now tell CIC how we want to run these blocks
-c.run(blck);
+c.run(blck, blck2);
 end

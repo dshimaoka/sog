@@ -105,7 +105,7 @@ for ii = 1:nrConds
     g{ii}.phase = 0;
     g{ii}.orientation = mod(thisDirection, 180) - 90;
     g{ii}.directionPolarity = -2*fix(thisDirection/180) + 1;
-    g{ii}.phaseSpeed = g{ii}.directionPolarity * args.speed * frequency /g{ii}.frameRate; %[deg/frame]
+    g{ii}.phaseSpeed = 360*g{ii}.directionPolarity * args.speed * frequency /g{ii}.frameRate; %[deg/frame]
     % g{ii}.orientation = '@mod(patch.direction, 180) - 90'; %NG
     % g{ii}.directionPolarity = '@-2*fix(patch.direction/180) + 1'; %NG
     % g{ii}.phaseSpeed = '@360*patch.directionPolarity * patch.speed * patch.frequency /patch.frameRate'; %[deg/frame]
@@ -171,6 +171,9 @@ for ii = 1:nrConds
     theseValues(ii) = false;
     myDesign.fac1.(sprintf('patch%d',ii)).disabled = theseValues;
 end
+
+blck2 = block('control', myDesign_ctrl);
+
 
 %% Define conditions and blocks
 blck=block('block', myDesign);%rsvp);                  % Define a block based on this factorial
