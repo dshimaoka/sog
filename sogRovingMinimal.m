@@ -1,13 +1,7 @@
 function sogRovingMinimal(subject, varargin)
 %%
-% rsvp of Gratings Example
+% rsvp of Gratings with roving design
 %
-% Shows how a single stimulus ( a grating in this case) can be shown as a
-% rapid visual rsvp (RSVP) with one or more of its properties changing within a
-% trial.
-%
-% The experiment starts with a red dot, click with a mouse to fixate, then
-% the rsvp of gratings will show.
 %
 % created from sogDemo
 
@@ -42,8 +36,7 @@ import neurostim.*
 
 
 %% Setup CIC and the stimuli.
-c = marmolab.rigcfg('debug',args.debug, p.Unmatched); % set to false to save githash at start of each experiment!
-c.paradigm = 'sogRoving';
+c = myRig; 
 c.addProperty('tDur',args.tDur); %duration of one sequence in ms
 c.trialDuration = '@cic.tDur';
 c.screen.color.background = [0 0 0];

@@ -31,7 +31,6 @@ p.KeepUnmatched = true;
 p.addParameter('subject', 'test', @(x) ischar(x));
 p.addParameter('debug',false,@(x) validateattributes(x,{'logical'},{'scalar','nonempty'}));
 
-%p.addParameter('tDur',5000);%number of 1 sequence [ms]
 p.addParameter('nRep',3,@(x) validateattributes(x,{'numeric'},{'scalar','nonempty'}));  % number of sequences
 
 % parameters for rsvp
@@ -41,6 +40,10 @@ p.addParameter('offFrames',6);%number of frames per presentation
 p.addParameter('dirList',0:15:165);%0:30:330);
 p.addParameter('speed',11, @(x) validateattributes(x,{'numeric'},{'scalar','nonempty'})); %[(visual angle in deg)/s]
 p.addParameter('radius',15, @(x) validateattributes(x,{'numeric'},{'scalar','nonempty'})); %aperture size [deg]
+
+% parameters for reward
+p.addParameter('rewardVolume',0.020,@(x) validateattributes(x,{'numeric'},{'nonempty','scalar','positive'})); % reward volume (ml)
+p.addParameter('rewardRate',0.1,@(x) validateattributes(x,{'numeric'},{'nonempty','scalar','positive'})); % reward rate (ml/min)
 
 p.parse(subject,varargin{:});
 args = p.Results;
@@ -115,6 +118,34 @@ rsvp.conditions(:).patch.direction =plugins.jitter(c,{args.dirList},'distributio
 rsvp.randomization = 'RANDOMWITHOUTREPLACEMENT'; % Randomize
 g.addRSVP(rsvp,'duration', args.onFrames*1000/c.screen.frameRate, ...
     'isi', args.offFrames*1000/c.screen.frameRate); % Tell the stimulus that it should run this rsvp (in every trial). 5 frames on 2 frames off.
+
+
+%% "fixate" for reward...
+marmolab.behaviors.fixate(c,'fix');
+c.fix.on = 0;
+c.fix.from = '@fix.startTime.fixating';
+c.fix.tolerance = args.radius; % radius (deg.)
+c.fix.grace = Inf;
+
+c.fix.failEndsTrial = false;
+c.fix.successEndsTrial = false;
+
+c.fix.verbose = false;
+
+%% reward from marmolab-stimuli/+freeviewing/utimages.m
+% p(reward) = (ml/min)/(s/min) /(frames/s) /(ml/reward) = reward/frame
+%
+% e.g., 0.1/60 /120 /0.020 = 6.9444e-04
+c.fix.addProperty('rewardVolume',args.rewardVolume);
+c.fix.addProperty('rewardRate',args.rewardRate);
+
+c.fix.addProperty('pReward',NaN);
+c.fix.pReward = args.rewardRate/60/c.screen.frameRate/args.rewardVolume;
+
+if ~isempty(c.pluginsByClass('newera'))  
+  % add liquid reward... newera syringe pump
+  c.newera.add('volume',args.rewardVolume,'when','AFTERFRAME','repeat',true,'criterion','@fix.isFixating & binornd(1,fix.pReward)');
+end
 
 %% Turn off logging
 
