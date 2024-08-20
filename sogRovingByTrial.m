@@ -156,8 +156,8 @@ end
     g0.on                =  0;
 
     rsvp =design('rsvp');           % Define a factorial with one factor
-    rsvp.fac1.(sprintf('%s',stimName)).direction = args.dirList; % OK
-    rsvp.fac1.(sprintf('%s',stimName)).contrast = g0.contrast; %dummy factorization
+    rsvp.fac1.patch0.direction = args.dirList; % OK
+    rsvp.fac1.patch0.contrast = g0.contrast; %dummy factorization
     rsvp.randomization = 'RANDOMWITHOUTREPLACEMENT'; % Randomize
     g0.addRSVP(rsvp,'duration', args.onFrames*1000/c.screen.frameRate, ...
         'isi', args.offFrames*1000/c.screen.frameRate); % Tell the stimulus that it should run this rsvp (in every trial). 5 frames on 2 frames off.
