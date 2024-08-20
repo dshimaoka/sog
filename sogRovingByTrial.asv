@@ -204,16 +204,24 @@ end
 myDesign = design('roving');
 for ii = 1:nrConds
     theseValues = logical(ones(1,nrConds+1));
-    theseValues(ii) = false;
-    myDesign.fac1.(sprintf('patch%d',ii-1)).disabled = theseValues;
+    theseValues(ii+1) = false;
+    myDesign.fac1.(sprintf('patch%d',ii)).disabled = theseValues;
 end
+myDesign.fac1.patch0.disabled = logical(ones(1,nrConds+1));
 
 %% Define conditions and blocks
 blck=block('block', myDesign);%rsvp);                  % Define a block based on this factorial
 blck.nrRepeats  = args.nRep;                        % Each condition is repeated this many times
 
 myDesign_ctrl = design('control');
-myDesign_ctrl.fac1.patch0.X = 0; %fake
+for ii = 1:nrConds
+    theseValues = logical(ones(1,nrConds+1));
+    theseValues(ii+1) = false;
+    myDesign.fac1.(sprintf('patch%d',ii)).disabled = theseValues;
+end
+myDesign.fac1.patch0.disabled = logical(ones(1,nrConds+1));
+
+%myDesign_ctrl.fac1.patch0.X = 0; %fake
 
 blck2 = block('control', myDesign_ctrl);
 blck2.nrRepeats  = args.nRep*nrConds;

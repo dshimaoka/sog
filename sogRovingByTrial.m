@@ -214,7 +214,12 @@ blck=block('block', myDesign);%rsvp);                  % Define a block based on
 blck.nrRepeats  = args.nRep;                        % Each condition is repeated this many times
 
 myDesign_ctrl = design('control');
-myDesign_ctrl.fac1.patch0.X = 0; %fake
+for ii = 1:nrConds
+    myDesign_ctrl.fac1.(sprintf('patch%d',ii)).disabled = logical(ones(1,nrConds+1)); %always off
+end
+myDesign_ctrl.fac1.patch0.disabled = logical(zeros(1,nrConds+1)); %always on
+
+%myDesign_ctrl.fac1.patch0.X = 0; %fake
 
 blck2 = block('control', myDesign_ctrl);
 blck2.nrRepeats  = args.nRep*nrConds;
@@ -222,5 +227,5 @@ blck2.nrRepeats  = args.nRep*nrConds;
 %% Run the experiment
 %c.cursor = 'arrow';
 % Now tell CIC how we want to run these blocks
-c.run(blck)%, blck2);
+c.run(blck2);
 end
