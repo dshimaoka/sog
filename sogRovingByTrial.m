@@ -202,11 +202,12 @@ end
 
 %% make sure gaborXX and gaborYY are not presented at the same time
 myDesign = design('roving');
-for ii = 0:nrConds
-    theseValues = logical(ones(1,nrConds));
-    theseValues(ii) = false;
+for ii = 1:nrConds
+    theseValues = logical(ones(1,nrConds+1));
+    theseValues(ii+1) = false;
     myDesign.fac1.(sprintf('patch%d',ii)).disabled = theseValues;
 end
+myDesign.fac1.patch0.disabled = logical(ones(1,nrConds+1));
 
 %% Define conditions and blocks
 blck=block('block', myDesign);%rsvp);                  % Define a block based on this factorial
