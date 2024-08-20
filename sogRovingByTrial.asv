@@ -64,7 +64,7 @@ commandwindow;
 c = marmolab.rigcfg('debug',args.debug, p.Unmatched); % set to false to save githash at start of each experiment!
 c.paradigm = 'sogRoving';
 c.addProperty('redLuminance', redLuminance);
-c.trialDuration = '@patch.tDur'; %'@fixbhv.startTime.FIXATING+patch.tDur';
+c.trialDuration = '@patch1.tDur'; %'@fixbhv.startTime.FIXATING+patch.tDur';
 c.screen.color.background = [0 0 0];
 tDur_cycle = (args.onFrames + args.offFrames)*1000/c.screen.frameRate; %one presentation cycle [ms]
 c.iti = 0;%tDur_cycle;
@@ -82,6 +82,7 @@ g = cell(nrConds,1);
 for ii = 1:nrConds
     stimName = ['patch' num2str(ii)];
     g{ii} = neurostim.stimuli.gabor(c,stimName); % neurostim.stimuli.gabor
+    thisDirection = dirList(ii);
 
     g{ii}.addProperty('tDur', 0); %duration of one successive presentations [ms]
     g{ii}.addProperty('frameRate', c.screen.frameRate);
@@ -104,7 +105,7 @@ for ii = 1:nrConds
     g{ii}.phase = 0;
     g{ii}.orientation = mod(thisDirection, 180) - 90;
     g{ii}.directionPolarity = -2*fix(thisDirection/180) + 1;
-    g{ii}.phaseSpeed = '@360*patchdirectionPolarity * patch.speed * patch.frequency /patch.frameRate'; %[deg/frame]
+    g{ii}.phaseSpeed = g{ii}.directionPolarity * args.speed * frequency /g{ii}.frameRate; %[deg/frame]
     % g{ii}.orientation = '@mod(patch.direction, 180) - 90'; %NG
     % g{ii}.directionPolarity = '@-2*fix(patch.direction/180) + 1'; %NG
     % g{ii}.phaseSpeed = '@360*patch.directionPolarity * patch.speed * patch.frequency /patch.frameRate'; %[deg/frame]
@@ -117,8 +118,8 @@ for ii = 1:nrConds
     % define these "conditions" in the rsvp.
     %rsvpName =  ['rsvp' num2str(ii)];
     rsvp =design('rsvp');           % Define a factorial with one factor
-    rsvp.fac1.patch.direction = dirList(ii); % OK
-    rsvp.fac1.patch.contrast = g{ii}.contrast; %dummy factorization
+    rsvp.fac1.(sprintf('%s',stimName)).direction = thisDirection; % OK
+    rsvp.fac1.(sprintf('%s',stimName)).contrast = g{ii}.contrast; %dummy factorization
     % rsvp.conditions(:).patch.direction =plugins.jitter(c,{args.dirList},'distribution',@set_direction);
     rsvp.randomization = 'RANDOMWITHOUTREPLACEMENT'; % Randomize
     g{ii}.addRSVP(rsvp,'duration', args.onFrames*1000/c.screen.frameRate, ...

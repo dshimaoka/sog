@@ -64,7 +64,7 @@ commandwindow;
 c = marmolab.rigcfg('debug',args.debug, p.Unmatched); % set to false to save githash at start of each experiment!
 c.paradigm = 'sogRoving';
 c.addProperty('redLuminance', redLuminance);
-c.trialDuration = '@patch.tDur'; %'@fixbhv.startTime.FIXATING+patch.tDur';
+c.trialDuration = '@patch1.tDur'; %'@fixbhv.startTime.FIXATING+patch.tDur';
 c.screen.color.background = [0 0 0];
 tDur_cycle = (args.onFrames + args.offFrames)*1000/c.screen.frameRate; %one presentation cycle [ms]
 c.iti = 0;%tDur_cycle;
@@ -118,8 +118,8 @@ for ii = 1:nrConds
     % define these "conditions" in the rsvp.
     %rsvpName =  ['rsvp' num2str(ii)];
     rsvp =design('rsvp');           % Define a factorial with one factor
-    rsvp.fac1.patch.direction = thisDirection; % OK
-    rsvp.fac1.patch.contrast = g{ii}.contrast; %dummy factorization
+    rsvp.fac1.(sprintf('%s',stimName)).direction = thisDirection; % OK
+    rsvp.fac1.(sprintf('%s',stimName)).contrast = g{ii}.contrast; %dummy factorization
     % rsvp.conditions(:).patch.direction =plugins.jitter(c,{args.dirList},'distribution',@set_direction);
     rsvp.randomization = 'RANDOMWITHOUTREPLACEMENT'; % Randomize
     g{ii}.addRSVP(rsvp,'duration', args.onFrames*1000/c.screen.frameRate, ...
