@@ -95,10 +95,10 @@ g.sigma             = args.radius;
 g.flickerMode = 'sinecontrast';%'none'; %none makes the phase difference between patches more apparent
 g.flickerFrequency = 0;
 g.phase = 0;
-g.orientation = '@patch.direction-90';
-%g.directionPolarity = 1;%'@-2*fix(patch.direction/180) + 1'; %TOBE FIXED
-g.phaseSpeed = '@360*patch.speed * patch.frequency /patch.frameRate'; %[deg/frame]
-g.mask              ='CIRCLE';
+g.orientation = '@mod(patch.direction, 180) - 90';
+g.directionPolarity = '@-2*fix(patch.direction/180) + 1'; 
+g.phaseSpeed = '@360*patch.directionPolarity * patch.speed * patch.frequency /patch.frameRate'; %[deg/frame]
+g.mask              = 'CIRCLE';
 g.frequency         = frequency;
 g.on                =  0;%'@fixbhv.startTime.FIXATING +cic.fixDuration'; % Start showing fixDuration [ms] after the subject starts fixating (See 'fixation' object below).
 
