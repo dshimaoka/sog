@@ -222,5 +222,5 @@ blck2.nrRepeats  = args.nRep*nrConds;
 %% Run the experiment
 %c.cursor = 'arrow';
 % Now tell CIC how we want to run these blocks
-c.run(blck2)%, blck2);
+c.run(blck)%, blck2);
 end
