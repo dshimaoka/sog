@@ -95,8 +95,8 @@ g.sigma             = args.radius;
 g.flickerMode = 'sinecontrast';%'none'; %none makes the phase difference between patches more apparent
 g.flickerFrequency = 0;
 g.phase = 0;
-g.orientation = '@mod(270, 180) - 90';
-g.directionPolarity = '@-2*fix(patch.direction/180) + 1'; 
+g.orientation = '@mod(patch.direction, 180) - 90'; %NG
+g.directionPolarity = '@-2*fix(patch.direction/180) + 1'; %NG
 g.phaseSpeed = '@360*patch.directionPolarity * patch.speed * patch.frequency /patch.frameRate'; %[deg/frame]
 g.mask              = 'CIRCLE';
 g.frequency         = frequency;
@@ -112,13 +112,13 @@ g.on                =  0;%'@fixbhv.startTime.FIXATING +cic.fixDuration'; % Start
 % We want to show a rapid rsvp of gratings. Use the factorial class to
 % define these "conditions" in the rsvp.
 rsvp =design('rsvp');           % Define a factorial with one factor
-%rsvp.fac1.patch.orientation = args.ori1List; % OK
+rsvp.fac1.patch.direction = args.dirList; % OK
 rsvp.fac1.patch.contrast = g.contrast; %dummy factorization
-rsvp.conditions(:).patch.direction =plugins.jitter(c,{args.dirList},'distribution',@set_direction);
+% rsvp.conditions(:).patch.direction =plugins.jitter(c,{args.dirList},'distribution',@set_direction);
 rsvp.randomization = 'RANDOMWITHOUTREPLACEMENT'; % Randomize
 g.addRSVP(rsvp,'duration', args.onFrames*1000/c.screen.frameRate, ...
     'isi', args.offFrames*1000/c.screen.frameRate); % Tell the stimulus that it should run this rsvp (in every trial). 5 frames on 2 frames off.
-
+%< FIXME??
 
 %% "fixate" for reward...
 marmolab.behaviors.fixate(c,'fix');
