@@ -127,7 +127,6 @@ end
 
 %% equiprobable control condition
     g0 = neurostim.stimuli.gabor(c,'patch0'); % neurostim.stimuli.gabor
-    thisDirection = dirList(ii);
 
     g0.addProperty('tDur', 0); %duration of one successive presentations [ms]
     g0.addProperty('frameRate', c.screen.frameRate);
@@ -203,7 +202,7 @@ end
 
 %% make sure gaborXX and gaborYY are not presented at the same time
 myDesign = design('roving');
-for ii = 1:nrConds
+for ii = 0:nrConds
     theseValues = logical(ones(1,nrConds));
     theseValues(ii) = false;
     myDesign.fac1.(sprintf('patch%d',ii)).disabled = theseValues;
