@@ -79,7 +79,7 @@ g=stimuli.gabor(c,'patch');
 g.addProperty('tDur', 0); %duration of one successive presentations [ms]
 g.addProperty('frameRate', c.screen.frameRate);
 g.addProperty('direction',0);
-%g.addProperty('directionPolarity',0);
+g.addProperty('directionPolarity',0);
 g.addProperty('speed',args.speed);
 
 tDurChoices =  tDur_cycle*args.nSuccessivePresentations(1):tDur_cycle:tDur_cycle*args.nSuccessivePresentations(2);
