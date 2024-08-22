@@ -69,6 +69,7 @@ c.trialDuration = '@patch1.tDur'; %'@fixbhv.startTime.FIXATING+patch.tDur';
 c.screen.color.background = [0 0 0];
 tDur_cycle = (args.onFrames + args.offFrames)*1000/c.screen.frameRate; %one presentation cycle [ms]
 c.iti = 0;%tDur_cycle;
+c.addProperty('ctrl', args.ctrl);
 
 if ~args.debug % log git hash
     hash = marmolab.getGitHash(fileparts(mfilename('fullpath')));
@@ -77,6 +78,7 @@ end
 
 % Create a Gabor stimulus.
 dirList = args.dirList;
+ctrl = args.ctrl;
 if ctrl
     nrConds = 1;
 else
