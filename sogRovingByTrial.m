@@ -98,7 +98,7 @@ g.flickerMode = 'sinecontrast';%'none'; %none makes the phase difference between
 g.flickerFrequency = 0;
 g.phase = 0;
 g.addProperty('thisDirection',[]);
-g.thisDirection = '@patch.Direction';
+g.thisDirection = '@patch.direction';
 g.orientation = '@mod(patch.thisDirection, 180) - 90'; %NG
 g.directionPolarity = '@-2*fix(patch.thisDirection/180) + 1'; %NG
 g.phaseSpeed = '@360*patch.directionPolarity * patch.speed * patch.frequency /patch.frameRate'; %[deg/frame]
