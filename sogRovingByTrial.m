@@ -145,7 +145,7 @@ pc.arcAngle = 360;
 pc.outerRad = args.radius+1;%pc.linewidth;
 pc.color = [1 1 1];
 pc.on = '@patch1.on';
-pc.to =  '@patch1.off';
+pc.off =  '@patch1.off';
 
 
 %% "fixate" for reward...
