@@ -97,8 +97,10 @@ g.sigma             = args.radius;
 g.flickerMode = 'sinecontrast';%'none'; %none makes the phase difference between patches more apparent
 g.flickerFrequency = 0;
 g.phase = 0;
-g.orientation = '@mod(patch.direction, 180) - 90'; %NG
-g.directionPolarity = '@-2*fix(patch.direction/180) + 1'; %NG
+g.addProperty('thisDirection',[]);
+g.thisDirection = '@patch.Direction';
+g.orientation = '@mod(patch.thisDirection, 180) - 90'; %NG
+g.directionPolarity = '@-2*fix(patch.thisDirection/180) + 1'; %NG
 g.phaseSpeed = '@360*patch.directionPolarity * patch.speed * patch.frequency /patch.frameRate'; %[deg/frame]
 g.mask              = 'CIRCLE';
 g.frequency         = frequency;
