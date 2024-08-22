@@ -145,8 +145,9 @@ pc.arcAngle = 360;
 pc.outerRad = args.radius+1;%pc.linewidth;
 pc.color = [1 1 1];
 pc.on = '@patch1.on';
-pc.off =  '@patch1.off';
-
+rsvp =design('rsvp');           % Define a factorial with one factor
+pc.addRSVP(rsvp,'duration', args.onFrames*1000/c.screen.frameRate, ...
+        'isi', args.offFrames*1000/c.screen.frameRate); 
 
 %% "fixate" for reward...
 marmolab.behaviors.fixate(c,'fix');
