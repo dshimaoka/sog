@@ -11,8 +11,8 @@ function sogRovingByTrial(subject, varargin)
 %
 % created from sogDemo
 
-% TODO: 
-% control sequence 
+% TODO:
+% control sequence
 % turn off logging
 % impose fixation only in the 1st trial?
 % shorten iti as much as possible
@@ -40,7 +40,7 @@ p.addParameter('offFrames',6);%number of frames per presentation
 p.addParameter('dirList',0:15:165);%0:30:330);
 p.addParameter('speed',11, @(x) validateattributes(x,{'numeric'},{'scalar','nonempty'})); %[(visual angle in deg)/s]
 p.addParameter('radius',15, @(x) validateattributes(x,{'numeric'},{'scalar','nonempty'})); %aperture size [deg]
-p.addParameter('ctrl',0, @(x) validateattributes(x,{'numeric'},{'scalar','nonempty'})); %0: roving, 1: random sequence
+p.addParameter('ctrl',1, @(x) validateattributes(x,{'numeric'},{'scalar','nonempty'})); 
 
 % parameters for reward
 p.addParameter('rewardVolume',0.020,@(x) validateattributes(x,{'numeric'},{'nonempty','scalar','positive'})); % reward volume (ml)
@@ -65,11 +65,10 @@ commandwindow;
 c = marmolab.rigcfg('debug',args.debug, p.Unmatched); % set to false to save githash at start of each experiment!
 c.paradigm = 'sogRoving';
 c.addProperty('redLuminance', redLuminance);
-c.trialDuration = '@patch.tDur'; %'@fixbhv.startTime.FIXATING+patch.tDur';
+c.trialDuration = '@patch1.tDur'; %'@fixbhv.startTime.FIXATING+patch.tDur';
 c.screen.color.background = [0 0 0];
 tDur_cycle = (args.onFrames + args.offFrames)*1000/c.screen.frameRate; %one presentation cycle [ms]
 c.iti = 0;%tDur_cycle;
-c.addProperty('ctrl', args.ctrl);
 
 if ~args.debug % log git hash
     hash = marmolab.getGitHash(fileparts(mfilename('fullpath')));
@@ -77,54 +76,62 @@ if ~args.debug % log git hash
 end
 
 % Create a Gabor stimulus.
-g=stimuli.gabor(c,'patch');
-g.addProperty('tDur', 0); %duration of one successive presentations [ms]
-g.addProperty('frameRate', c.screen.frameRate);
-g.addProperty('direction',0);
-g.addProperty('directionPolarity',0);
-g.addProperty('speed',args.speed);
-
-tDurChoices =  tDur_cycle*args.nSuccessivePresentations(1):tDur_cycle:tDur_cycle*args.nSuccessivePresentations(2);
-g.tDur = plugins.jitter(c,num2cell(tDurChoices), 'distribution','1ofN');
-
-g.color             = 0.5*[redLuminance 0 1 1]; 
-g.contrast          = 1;
-g.Y                 = 0;
-g.X                 = 0;
-g.width = 2*args.radius;
-g.height = g.width;
-g.sigma             = args.radius;
-g.flickerMode = 'sinecontrast';%'none'; %none makes the phase difference between patches more apparent
-g.flickerFrequency = 0;
-g.phase = 0;
-g.orientation = '@mod(patch.direction, 180) - 90'; %NG
-g.directionPolarity = '@-2*fix(patch.direction/180) + 1'; %NG
-g.phaseSpeed = '@360*patch.directionPolarity * patch.speed * patch.frequency /patch.frameRate'; %[deg/frame]
-g.mask              = 'CIRCLE';
-g.frequency         = frequency;
-g.on                =  0;%'@fixbhv.startTime.FIXATING +cic.fixDuration'; % Start showing fixDuration [ms] after the subject starts fixating (See 'fixation' object below).
-
-
-% define the sampling function
-    function val = set_direction(dir_list)
-          val = randsample(dir_list, 1);
-    end
-
-
-% We want to show a rapid rsvp of gratings. Use the factorial class to
-% define these "conditions" in the rsvp.
-rsvp =design('rsvp');           % Define a factorial with one factor
-
-if args.ctrl
-    rsvp.fac1.patch.direction = args.dirList; % OK
+dirList = args.dirList;
+if ctrl
+    nrConds = 1;
 else
-    rsvp.fac1.patch.contrast = g.contrast; %dummy factorization
-   rsvp.conditions(:).patch.direction =args.dirList;%plugins.jitter(c,{args.dirList},'distribution',@set_direction);
+    nrConds = numel(args.dirList);
 end
 
-rsvp.randomization = 'RANDOMWITHOUTREPLACEMENT'; % Randomize
-g.addRSVP(rsvp,'duration', args.onFrames*1000/c.screen.frameRate, ...
-    'isi', args.offFrames*1000/c.screen.frameRate); % Tell the stimulus that it should run this rsvp (in every trial). 5 frames on 2 frames off.
+g = cell(nrConds,1);
+for ii = 1:nrConds
+    stimName = ['patch' num2str(ii)];
+    g{ii} = neurostim.stimuli.gabor(c,stimName); % neurostim.stimuli.gabor
+    thisDirection = dirList(ii);
+
+    g{ii}.addProperty('tDur', 0); %duration of one successive presentations [ms]
+    g{ii}.addProperty('frameRate', c.screen.frameRate);
+    g{ii}.addProperty('direction',0);
+    g{ii}.addProperty('directionPolarity',0);
+    g{ii}.addProperty('speed',args.speed);
+
+    tDurChoices =  tDur_cycle*args.nSuccessivePresentations(1):tDur_cycle:tDur_cycle*args.nSuccessivePresentations(2);
+    g{ii}.tDur = plugins.jitter(c,num2cell(tDurChoices), 'distribution','1ofN');
+
+    g{ii}.color             = 0.5*[redLuminance 0 1 1];
+    g{ii}.contrast          = 1;
+    g{ii}.Y                 = 0;
+    g{ii}.X                 = 0;
+    g{ii}.width = 2*args.radius;
+    g{ii}.height = g{ii}.width;
+    g{ii}.sigma             = args.radius;
+    g{ii}.flickerMode = 'sinecontrast';%'none'; %none makes the phase difference between patches more apparent
+    g{ii}.flickerFrequency = 0;
+    g{ii}.phase = 0;
+    g{ii}.orientation = mod(thisDirection, 180) - 90;
+    g{ii}.directionPolarity = -2*fix(thisDirection/180) + 1;
+    g{ii}.phaseSpeed = 360*g{ii}.directionPolarity * args.speed * frequency /g{ii}.frameRate; %[deg/frame]
+    g{ii}.mask              = 'CIRCLE';
+    g{ii}.frequency         = frequency;
+    g{ii}.on                =  0;%'@fixbhv.startTime.FIXATING +cic.fixDuration'; % Start showing fixDuration [ms] after the subject starts fixating (See 'fixation' object below).
+
+
+    % We want to show a rapid rsvp of gratings. Use the factorial class to
+    % define these "conditions" in the rsvp.
+    %rsvpName =  ['rsvp' num2str(ii)];
+    rsvp =design('rsvp');           % Define a factorial with one factor
+    if ctrl
+         rsvp.fac1.(sprintf('%s',stimName)).direction = args.dirList; % OK
+    else
+    rsvp.fac1.(sprintf('%s',stimName)).direction = thisDirection; % OK
+    rsvp.fac1.(sprintf('%s',stimName)).contrast = g{ii}.contrast; %dummy factorization
+    end
+    
+    rsvp.randomization = 'RANDOMWITHOUTREPLACEMENT'; % Randomize
+    g{ii}.addRSVP(rsvp,'duration', args.onFrames*1000/c.screen.frameRate, ...
+        'isi', args.offFrames*1000/c.screen.frameRate); % Tell the stimulus that it should run this rsvp (in every trial). 5 frames on 2 frames off.
+end
+
 
 %% "fixate" for reward...
 marmolab.behaviors.fixate(c,'fix');
@@ -138,35 +145,48 @@ c.fix.verbose = false;
 
 %% reward from marmolab-stimuli/+freeviewing/utimages.m
 % p(reward) = (ml/min)/(s/min) /(frames/s) /(ml/reward) = reward/frame
+%
 % e.g., 0.1/60 /120 /0.020 = 6.9444e-04
 c.fix.addProperty('rewardVolume',args.rewardVolume);
 c.fix.addProperty('rewardRate',args.rewardRate);
-
 c.fix.addProperty('pReward',NaN);
 c.fix.pReward = args.rewardRate/60/c.screen.frameRate/args.rewardVolume;
 
-if ~isempty(c.pluginsByClass('newera'))  
-  % add liquid reward... newera syringe pump
-  c.newera.add('volume',args.rewardVolume,'when','AFTERFRAME','repeat',true,'criterion','@fix.isFixating & binornd(1,fix.pReward)');
+if ~isempty(c.pluginsByClass('newera'))
+    % add liquid reward... newera syringe pump
+    c.newera.add('volume',args.rewardVolume,'when','AFTERFRAME','repeat',true,'criterion','@fix.isFixating & binornd(1,fix.pReward)');
 end
 
 %% Turn off logging
 
 
 
-%% This is all you need for an rsvp rsvp. The rest is just to make it into a full experiment.
+
 
 %% Behavioral control
+
 %Make sure there is an eye tracker (or at least a virtual one)
 if isempty(c.pluginsByClass('eyetracker'))
     e = neurostim.plugins.eyetracker(c);      %Eye tracker plugin not yet added, so use the virtual one. Mouse is used to control gaze position (click)
     e.useMouse = true;
 end
 
+%% make sure gaborXX and gaborYY are not presented at the same time
+myDesign = design('roving');
+for ii = 1:nrConds
+    theseValues = logical(ones(1,nrConds));
+    theseValues(ii) = false;
+    myDesign.fac1.(sprintf('patch%d',ii)).disabled = theseValues;
+end
 
 %% Define conditions and blocks
-blck=block('block', rsvp);                  % Define a block based on this factorial
-blck.nrRepeats  = args.nRep;                        % Each condition is repeated this many times
+blck=block('block', myDesign);%rsvp);                  % Define a block based on this factorial
+if ctrl
+    blck.nrRepeats  = args.nRep*nrConds;
+else
+    blck.nrRepeats  = args.nRep;                        % Each condition is repeated this many times
+end
+
 
 %% Run the experiment
 %c.cursor = 'arrow';
