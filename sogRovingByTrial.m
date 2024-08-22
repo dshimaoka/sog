@@ -123,10 +123,9 @@ for ii = 1:nrConds
     %rsvpName =  ['rsvp' num2str(ii)];
     rsvp =design('rsvp');           % Define a factorial with one factor
     if ctrl
-         rsvp.fac1.(sprintf('%s',stimName)).direction = args.dirList; % OK
+         rsvp.fac1.(sprintf('%s',stimName)).direction = args.dirList; %use all directions
     else
-        rsvp.fac1.(sprintf('%s',stimName)).direction = thisDirection; % OK
-        %rsvp.fac1.(sprintf('%s',stimName)).contrast = g{ii}.contrast; %dummy factorization
+        rsvp.fac1.(sprintf('%s',stimName)).direction = thisDirection; %use only one direction
     end
     
     rsvp.randomization = 'RANDOMWITHOUTREPLACEMENT'; % Randomize
@@ -182,7 +181,7 @@ for ii = 1:nrConds
 end
 
 %% Define conditions and blocks
-blck=block('block', myDesign);%rsvp);                  % Define a block based on this factorial
+blck=block('block', rsvp);%myDesign);                % Define a block based on this factorial
 if ctrl
     blck.nrRepeats  = args.nRep*numel(args.dirList);
 else
@@ -191,7 +190,6 @@ end
 
 
 %% Run the experiment
-%c.cursor = 'arrow';
 % Now tell CIC how we want to run these blocks
 c.run(blck);
 end
