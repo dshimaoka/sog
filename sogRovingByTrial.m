@@ -120,10 +120,10 @@ for ii = 1:nrConds
 
     % We want to show a rapid rsvp of gratings. Use the factorial class to
     % define these "conditions" in the rsvp.
-    %rsvpName =  ['rsvp' num2str(ii)];
     rsvp =design('rsvp');           % Define a factorial with one factor
     if ctrl
-         rsvp.fac1.(sprintf('%s',stimName)).direction = args.dirList; %use all directions
+         % rsvp.fac1.(sprintf('%s',stimName)).direction = args.dirList; %use all directions
+         rsvp.fac1.patch1.orientation = args.dirList; % OK
     else
         rsvp.fac1.(sprintf('%s',stimName)).direction = thisDirection; %use only one direction
     end
@@ -173,7 +173,7 @@ if isempty(c.pluginsByClass('eyetracker'))
 end
 
 %% make sure gaborXX and gaborYY are not presented at the same time
-myDesign = design('roving');
+myDesign = design('roving'); %RENAME
 for ii = 1:nrConds
     theseValues = logical(ones(1,nrConds));
     theseValues(ii) = false;
@@ -181,7 +181,7 @@ for ii = 1:nrConds
 end
 
 %% Define conditions and blocks
-blck=block('block', rsvp);%myDesign);                % Define a block based on this factorial
+blck=block('block', myDesign);                % Define a block based on this factorial
 if ctrl
     blck.nrRepeats  = args.nRep*numel(args.dirList);
 else
