@@ -97,11 +97,9 @@ g.sigma             = args.radius;
 g.flickerMode = 'sinecontrast';%'none'; %none makes the phase difference between patches more apparent
 g.flickerFrequency = 0;
 g.phase = 0;
-g.addProperty('thisDirection',[]);
-g.thisDirection = '@patch.direction';
-g.orientation = '@mod(patch.thisDirection, 180) - 90'; %NG
-g.directionPolarity = '@-2*fix(patch.thisDirection/180) + 1'; %NG
-g.phaseSpeed = '@360*patch.directionPolarity * patch.speed * patch.frequency /patch.frameRate'; %[deg/frame]
+% g.orientation = '@mod(patch.direction, 180) - 90'; %NG
+% g.directionPolarity = '@-2*fix(patch.direction/180) + 1'; %NG
+% g.phaseSpeed = '@360*patch.directionPolarity * patch.speed * patch.frequency /patch.frameRate'; %[deg/frame]
 g.mask              = 'CIRCLE';
 g.frequency         = frequency;
 g.on                =  0;%'@fixbhv.startTime.FIXATING +cic.fixDuration'; % Start showing fixDuration [ms] after the subject starts fixating (See 'fixation' object below).
@@ -121,7 +119,10 @@ if args.ctrl
     rsvp.fac1.patch.direction = args.dirList; % OK
 else
     rsvp.fac1.patch.contrast = g.contrast; %dummy factorization
-   rsvp.conditions(:).patch.direction =plugins.jitter(c,{args.dirList},'distribution',@set_direction);
+    rsvp.conditions(:).patch.direction =plugins.jitter(c,{args.dirList},'distribution',@set_direction);
+    rsvp.conditions(:).patch.orientation = '@mod(patch.direction, 180) - 90';
+    rsvp.conditions(:).patch.directionPolarity = '@-2*fix(patch.direction/180) + 1'; %NG
+    rsvp.conditions(:).patch.phaseSpeed = '@360*patch.directionPolarity * patch.speed * patch.frequency /patch.frameRate'; %[deg/frame]
 end
 
 rsvp.randomization = 'RANDOMWITHOUTREPLACEMENT'; % Randomize
