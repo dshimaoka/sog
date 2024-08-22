@@ -126,7 +126,7 @@ for ii = 1:nrConds
          rsvp.fac1.(sprintf('%s',stimName)).direction = args.dirList; % OK
     else
         rsvp.fac1.(sprintf('%s',stimName)).direction = thisDirection; % OK
-        rsvp.fac1.(sprintf('%s',stimName)).contrast = g{ii}.contrast; %dummy factorization
+        %rsvp.fac1.(sprintf('%s',stimName)).contrast = g{ii}.contrast; %dummy factorization
     end
     
     rsvp.randomization = 'RANDOMWITHOUTREPLACEMENT'; % Randomize
