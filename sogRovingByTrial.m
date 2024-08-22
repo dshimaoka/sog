@@ -69,6 +69,7 @@ c.trialDuration = '@patch.tDur'; %'@fixbhv.startTime.FIXATING+patch.tDur';
 c.screen.color.background = [0 0 0];
 tDur_cycle = (args.onFrames + args.offFrames)*1000/c.screen.frameRate; %one presentation cycle [ms]
 c.iti = 0;%tDur_cycle;
+c.addProperty('ctrl', args.ctrl);
 
 if ~args.debug % log git hash
     hash = marmolab.getGitHash(fileparts(mfilename('fullpath')));
@@ -114,7 +115,7 @@ g.on                =  0;%'@fixbhv.startTime.FIXATING +cic.fixDuration'; % Start
 % define these "conditions" in the rsvp.
 rsvp =design('rsvp');           % Define a factorial with one factor
 
-if ctrl
+if args.ctrl
     rsvp.fac1.patch.direction = args.dirList; % OK
 else
     rsvp.fac1.patch.contrast = g.contrast; %dummy factorization
@@ -131,15 +132,12 @@ c.fix.on = 0;
 c.fix.from = '@fix.startTime.fixating';
 c.fix.tolerance = args.radius; % radius (deg.)
 c.fix.grace = Inf;
-
 c.fix.failEndsTrial = false;
 c.fix.successEndsTrial = false;
-
 c.fix.verbose = false;
 
 %% reward from marmolab-stimuli/+freeviewing/utimages.m
 % p(reward) = (ml/min)/(s/min) /(frames/s) /(ml/reward) = reward/frame
-%
 % e.g., 0.1/60 /120 /0.020 = 6.9444e-04
 c.fix.addProperty('rewardVolume',args.rewardVolume);
 c.fix.addProperty('rewardRate',args.rewardRate);
