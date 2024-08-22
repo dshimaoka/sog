@@ -139,6 +139,14 @@ for ii = 1:nrConds
         'isi', args.offFrames*1000/c.screen.frameRate); % Tell the stimulus that it should run this rsvp (in every trial). 5 frames on 2 frames off.
 end
 
+pc = stimuli.arc(c,'patchCountour');    % Add a fixation stimulus object (named "fix") to the cic. It is born with default values for all parameters.
+pc.linewidth= 1;               %The seemingly local variable "f" is actually a handle to the stimulus in CIC, so can alter the internal stimulus by modifying "f".
+pc.arcAngle = 360;
+pc.outerRad = args.radius+1;%pc.linewidth;
+pc.color = [1 1 1];
+pc.on = '@patch1.on';
+pc.to =  '@patch1.off';
+
 
 %% "fixate" for reward...
 marmolab.behaviors.fixate(c,'fix');
