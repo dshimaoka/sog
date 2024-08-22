@@ -110,20 +110,26 @@ for ii = 1:nrConds
     g{ii}.flickerMode = 'sinecontrast';%'none'; %none makes the phase difference between patches more apparent
     g{ii}.flickerFrequency = 0;
     g{ii}.phase = 0;
-    g{ii}.orientation = mod(thisDirection, 180) - 90;
-    g{ii}.directionPolarity = -2*fix(thisDirection/180) + 1;
-    g{ii}.phaseSpeed = 360*g{ii}.directionPolarity * args.speed * frequency /g{ii}.frameRate; %[deg/frame]
     g{ii}.mask              = 'CIRCLE';
     g{ii}.frequency         = frequency;
-    g{ii}.on                =  0;%'@fixbhv.startTime.FIXATING +cic.fixDuration'; % Start showing fixDuration [ms] after the subject starts fixating (See 'fixation' object below).
+    g{ii}.on                =  0;
+    if ctrl
+        g{ii}.orientation = '@mod(patch1.direction, 180) - 90';
+        g{ii}.directionPolarity = '@-2*fix(patch1.direction/180) + 1';
+        g{ii}.phaseSpeed = '@360*patch1.directionPolarity * patch1.speed * patch1.frequency /patch1.frameRate'; %[deg/frame]
+    else
+        g{ii}.orientation = mod(thisDirection, 180) - 90;
+        g{ii}.directionPolarity = -2*fix(thisDirection/180) + 1;
+        g{ii}.phaseSpeed = 360*g{ii}.directionPolarity * args.speed * frequency /g{ii}.frameRate; %[deg/frame]
+    end
 
 
     % We want to show a rapid rsvp of gratings. Use the factorial class to
     % define these "conditions" in the rsvp.
     rsvp =design('rsvp');           % Define a factorial with one factor
     if ctrl
-         % rsvp.fac1.(sprintf('%s',stimName)).direction = args.dirList; %use all directions
-         rsvp.fac1.patch1.orientation = args.dirList; % OK
+         rsvp.fac1.(sprintf('%s',stimName)).direction = args.dirList; %use all directions
+         %rsvp.fac1.patch1.orientation = args.dirList; % OK
     else
         rsvp.fac1.(sprintf('%s',stimName)).direction = thisDirection; %use only one direction
     end
