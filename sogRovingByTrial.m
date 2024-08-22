@@ -184,7 +184,7 @@ end
 %% Define conditions and blocks
 blck=block('block', myDesign);%rsvp);                  % Define a block based on this factorial
 if ctrl
-    blck.nrRepeats  = args.nRep*nrConds;
+    blck.nrRepeats  = args.nRep*numel(args.dirList);
 else
     blck.nrRepeats  = args.nRep;                        % Each condition is repeated this many times
 end
