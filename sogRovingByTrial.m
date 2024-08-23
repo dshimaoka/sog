@@ -198,7 +198,7 @@ if ~isempty(c.pluginsByClass('newera'))
 end
 
 %% key press for reporting odd fixation point
-k = behaviors.keyResponse(c,'keypress'); %registered upto once per trial
+k = behaviors.multiKeyResponse(c,'keypress'); %registered upto once per trial
 k.from = 0; % '@patch1.on'; 
 k.maximumRT= Inf;                   %Allow inf time for a response
 k.keys = {'space'};%,'z'};
