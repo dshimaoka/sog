@@ -18,7 +18,7 @@ classdef sog < marmodata.mdbase
 
         % behavioural response
         keyPressTime; %time when a key is perssed first time in a trial [ms]
-end
+    end
 
     methods (Access = public)
         function d = sog(varargin)
@@ -28,10 +28,10 @@ end
             % d.radius = getRadius(d); %radius of patches in [deg]
             % d.patchDirList = getPatchDirList(d); %list of stimulus directions
             % d.patchSpeed = getPatchSpeed(d); %stimulus speed [deg/s]
-             d.tDur = getTDur(d); %duration of a sequence [ms]
+            d.tDur = getTDur(d); %duration of a sequence [ms]
             % d.patchStart = getPatchStart(d); %onset times of patch
             % d.patchStop = getPatchStop(d); %offset times of patch
-            % 
+            %
             % % reward
             % d.rewardVol = getRewardVol(d);
             % d.rewardRate = getRewardRate(d);
@@ -55,23 +55,15 @@ end
 
             t0 =  d.meta.cic.firstFrame('time',Inf);
 
-            [time,trial,frame,keyTmp] = d.meta.keypress.keyIx('time',Inf);
-            key = cell2mat(keyTmp);
-            ignoreTrial = isnan(key);
-            keepInd = find(~ignoreTrial);
-            time = time(~ignoreTrial);
-            trial = trial(~ignoreTrial);
-            frame = frame(~ignoreTrial);
-            key = key(~ignoreTrial);
-
             keyPressTime = cell(d.numTrials, 1);
             for itr = 1:d.numTrials
-                keyPressTime{itr} = 1e3*(time(trial == itr) - t0(itr));
+                [time,trial,frame,keyTmp] = d.meta.keypress.keyIx('trial',itr);
+                keyPressTime{itr} = 1e3*(time - t0(itr));
                 if isempty( keyPressTime{itr})
-                     keyPressTime{itr} = NaN;
+                    keyPressTime{itr} = NaN;
                 end
             end
-          end
 
+        end
     end
 end
