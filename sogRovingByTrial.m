@@ -47,7 +47,7 @@ p.addParameter('rewardVolume',0.020,@(x) validateattributes(x,{'numeric'},{'none
 p.addParameter('rewardRate',0.1,@(x) validateattributes(x,{'numeric'},{'nonempty','scalar','positive'})); % reward rate (ml/min)
 
 % parameters for oddball fixations
-p.addParameter('probOddFixation', 0.1, @(x) validateattributes(x,{'numeric'},{'nonempty','scalar'}));
+p.addParameter('probOddFixation', 0, @(x) validateattributes(x,{'numeric'},{'nonempty','scalar'})); %probability of dim fixation point  [0-1]
 
 p.parse(subject,varargin{:});
 args = p.Results;
@@ -196,6 +196,14 @@ if ~isempty(c.pluginsByClass('newera'))
     % add liquid reward... newera syringe pump
     c.newera.add('volume',args.rewardVolume,'when','AFTERFRAME','repeat',true,'criterion','@fixbhv.isFixating & binornd(1,fixbhv.pReward)');
 end
+
+%% key press for reporting odd fixation point
+k = behaviors.keyResponse(c,'keypress'); %registered upto once per trial
+k.from = 0; % '@patch1.on'; 
+k.maximumRT= Inf;                   %Allow inf time for a response
+k.keys = {'space'};%,'z'};
+k.required = false; %   setting false means that even if this behavior is not successful (i.e. the wrong answer is given), the trial will not be repeated.
+
 
 %% Turn off logging
 
