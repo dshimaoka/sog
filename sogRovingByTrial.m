@@ -129,7 +129,6 @@ for ii = 1:nrConds
     rsvp =design('rsvp');           % Define a factorial with one factor
     if ctrl
          rsvp.fac1.(sprintf('%s',stimName)).direction = args.dirList; %use all directions
-         %rsvp.fac1.patch1.orientation = args.dirList; % OK
     else
         rsvp.fac1.(sprintf('%s',stimName)).direction = thisDirection; %use only one direction
     end
@@ -158,6 +157,8 @@ f.on='@patch1.on';                         % What time should the stimulus come 
 f.X = 0;
 f.Y = 0;
 rsvp =design('rsvp');           % Define a factorial with one factor
+rsvp.fac1.fixstim.color = [.5 1];
+rsvp.weights = [1 9];
 f.addRSVP(rsvp,'duration', args.onFrames*1000/c.screen.frameRate, ...
         'isi', args.offFrames*1000/c.screen.frameRate); 
 
