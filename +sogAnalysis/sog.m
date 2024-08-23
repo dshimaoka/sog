@@ -24,7 +24,7 @@ end
         function d = sog(varargin)
             d@marmodata.mdbase(varargin{:}); % base class constructor
 
-            d.patchDir = getPatchDir(d); %direction of patch [deg]
+            %d.patchDir = getPatchDir(d); %direction of patch [deg]
             % d.radius = getRadius(d); %radius of patches in [deg]
             % d.patchDirList = getPatchDirList(d); %list of stimulus directions
             % d.patchSpeed = getPatchSpeed(d); %stimulus speed [deg/s]
@@ -50,7 +50,7 @@ end
             patchDir = d.meta.patch.direction('time',Inf).data;
         end
 
-          function keyPressTime = getKeyPressTime(d)
+        function keyPressTime = getKeyPressTime(d) %FIXME only 1st key press is returned
             %get time of key press from the onset of each trial [ms]
 
             t0 =  d.meta.cic.firstFrame('time',Inf);
@@ -72,6 +72,6 @@ end
                 end
             end
           end
-          
+
     end
 end
