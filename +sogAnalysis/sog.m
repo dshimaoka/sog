@@ -15,7 +15,10 @@ classdef sog < marmodata.mdbase
         rewardRate;
         pReward;
         rewardTimes; %time of reward in each trial
-    end
+
+        % behavioural response
+        keyPressTime; %time when a key is perssed first time in a trial [ms]
+end
 
     methods (Access = public)
         function d = sog(varargin)
@@ -34,6 +37,9 @@ classdef sog < marmodata.mdbase
             % d.rewardRate = getRewardRate(d);
             % d.pReward = getPReward(d);
             % d.rewardTimes = getRewardTimes(d);
+
+            d.keyPressTime = getKeyPressTime(d);
+
         end
 
         function tDur = getTDur(d)
@@ -44,5 +50,28 @@ classdef sog < marmodata.mdbase
             patchDir = d.meta.patch.direction('time',Inf).data;
         end
 
+          function keyPressTime = getKeyPressTime(d)
+            %get time of key press from the onset of each trial [ms]
+
+            t0 =  d.meta.cic.firstFrame('time',Inf);
+
+            [time,trial,frame,keyTmp] = d.meta.keypress.keyIx('time',Inf);
+            key = cell2mat(keyTmp);
+            ignoreTrial = isnan(key);
+            keepInd = find(~ignoreTrial);
+            time = time(~ignoreTrial);
+            trial = trial(~ignoreTrial);
+            frame = frame(~ignoreTrial);
+            key = key(~ignoreTrial);
+
+            keyPressTime = cell(d.numTrials, 1);
+            for itr = 1:d.numTrials
+                keyPressTime{itr} = 1e3*(time(trial == itr) - t0(itr));
+                if isempty( keyPressTime{itr})
+                     keyPressTime{itr} = NaN;
+                end
+            end
+          end
+          
     end
 end
