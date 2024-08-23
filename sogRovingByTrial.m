@@ -158,7 +158,7 @@ f.X = 0;
 f.Y = 0;
 rsvp =design('rsvp');           % Define a factorial with one factor
 rsvp.fac1.fixstim.color = [.5 1];
-rsvp.weights = [1 9];
+rsvp.weights = [0.3 0.7];
 f.addRSVP(rsvp,'duration', args.onFrames*1000/c.screen.frameRate, ...
         'isi', args.offFrames*1000/c.screen.frameRate); 
 
