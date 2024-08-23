@@ -63,9 +63,8 @@ colorFixation = [.5 1];
 
 %total number of patches presented in a sequence
 numPresentations = args.nRep * numel(args.dirList) * mean(args.nSuccessivePresentations);
-numOddFixations = numPresentations * args.probOddFixation;
 probCtrlFixation = 1 - args.probOddFixation;
-weightFixation = [round(args.probOddFixation) round(probCtrlFixation)];
+weightFixation = [round(numPresentations * args.probOddFixation) round(numPresentations * probCtrlFixation)];
 
 %% Prerequisites.
 import neurostim.*
