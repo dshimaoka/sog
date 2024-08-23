@@ -149,28 +149,42 @@ rsvp =design('rsvp');           % Define a factorial with one factor
 pc.addRSVP(rsvp,'duration', args.onFrames*1000/c.screen.frameRate, ...
         'isi', args.offFrames*1000/c.screen.frameRate); 
 
+%% Fixation dot
+f = stimuli.fixation(c,'fixstim');    % Add a fixation stimulus object (named "fix") to the cic. It is born with default values for all parameters.
+f.shape = 'CIRC';               %The seemingly local variable "f" is actually a handle to the stimulus in CIC, so can alter the internal stimulus by modifying "f".
+f.size = 0.25; % units?
+f.color = [1 1 1];
+%f.addProperty('fixDurationRange', fixDurationRange);
+%f.addProperty('fixDuration', []); %should NOT add jitteer to cic. See jitteredITIdemo.m
+%f.fixDuration = plugins.jitter(c, fixDurationRange,'distribution','uniform');
+f.on=0;                         % What time should the stimulus come on? (all times are in ms)
+%f.duration = '@fixbhv.startTime.fixating+fixstim.fixDuration'; % Show spot briefly after fixation acquired
+f.X = 0;
+f.Y = 0;
+
+
 %% "fixate" for reward...
-marmolab.behaviors.fixate(c,'fix');
-c.fix.on = 0;
-c.fix.from = '@fix.startTime.fixating';
-c.fix.tolerance = args.radius; % radius (deg.)
-c.fix.grace = Inf;
-c.fix.failEndsTrial = false;
-c.fix.successEndsTrial = false;
-c.fix.verbose = false;
+marmolab.behaviors.fixate(c,'fixbhv');
+c.fixbhv.on = 0;
+c.fixbhv.from = '@fixbhv.startTime.fixating';
+c.fixbhv.tolerance = args.radius; % radius (deg.)
+c.fixbhv.grace = Inf;
+c.fixbhv.failEndsTrial = false;
+c.fixbhv.successEndsTrial = false;
+c.fixbhv.verbose = false;
 
 %% reward from marmolab-stimuli/+freeviewing/utimages.m
 % p(reward) = (ml/min)/(s/min) /(frames/s) /(ml/reward) = reward/frame
 %
 % e.g., 0.1/60 /120 /0.020 = 6.9444e-04
-c.fix.addProperty('rewardVolume',args.rewardVolume);
-c.fix.addProperty('rewardRate',args.rewardRate);
-c.fix.addProperty('pReward',NaN);
-c.fix.pReward = args.rewardRate/60/c.screen.frameRate/args.rewardVolume;
+c.fixbhv.addProperty('rewardVolume',args.rewardVolume);
+c.fixbhv.addProperty('rewardRate',args.rewardRate);
+c.fixbhv.addProperty('pReward',NaN);
+c.fixbhv.pReward = args.rewardRate/60/c.screen.frameRate/args.rewardVolume;
 
 if ~isempty(c.pluginsByClass('newera'))
     % add liquid reward... newera syringe pump
-    c.newera.add('volume',args.rewardVolume,'when','AFTERFRAME','repeat',true,'criterion','@fix.isFixating & binornd(1,fix.pReward)');
+    c.newera.add('volume',args.rewardVolume,'when','AFTERFRAME','repeat',true,'criterion','@fixbhv.isFixating & binornd(1,fixbhv.pReward)');
 end
 
 %% Turn off logging
