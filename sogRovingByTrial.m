@@ -46,6 +46,9 @@ p.addParameter('ctrl',1, @(x) validateattributes(x,{'numeric'},{'scalar','nonemp
 p.addParameter('rewardVolume',0.020,@(x) validateattributes(x,{'numeric'},{'nonempty','scalar','positive'})); % reward volume (ml)
 p.addParameter('rewardRate',0.1,@(x) validateattributes(x,{'numeric'},{'nonempty','scalar','positive'})); % reward rate (ml/min)
 
+% parameters for oddball fixations
+p.addParameter('probOddFixation', 0.1, @(x) validateattributes(x,{'numeric'},{'nonempty','scalar'}));
+
 p.parse(subject,varargin{:});
 args = p.Results;
 
@@ -56,6 +59,13 @@ args = p.Results;
 %iti = 1000; %[ms] inter trial interval
 frequency = 0.5; %spatial frequency in cycles per visual angle in degree (not pixel) %Kapoor 2022
 redLuminance = 171/255; %Fraser ... Miller 2023
+colorFixation = [.5 1];
+
+%total number of patches presented in a sequence
+numPresentations = args.nRep * numel(args.dirList) * mean(args.nSuccessivePresentations);
+numOddFixations = numPresentations * args.probOddFixation;
+probCtrlFixation = 1 - args.probOddFixation;
+weightFixation = [round(args.probOddFixation) round(probCtrlFixation)];
 
 %% Prerequisites.
 import neurostim.*
@@ -152,13 +162,14 @@ pc.addRSVP(rsvp,'duration', args.onFrames*1000/c.screen.frameRate, ...
 f = stimuli.fixation(c,'fixstim');    % Add a fixation stimulus object (named "fix") to the cic. It is born with default values for all parameters.
 f.shape = 'CIRC';               %The seemingly local variable "f" is actually a handle to the stimulus in CIC, so can alter the internal stimulus by modifying "f".
 f.size = 0.25; % units?
-f.color = 1;
+f.addProperty('colorFixation', colorFixation);
+f.addProperty('weightFixation', weightFixation);
 f.on='@patch1.on';                         % What time should the stimulus come on? (all times are in ms)
 f.X = 0;
 f.Y = 0;
 rsvp =design('rsvp');           % Define a factorial with one factor
-rsvp.fac1.fixstim.color = [.5 1];
-rsvp.weights = [0.3 0.7];
+rsvp.fac1.fixstim.color = colorFixation;
+rsvp.weights = weightFixation;
 f.addRSVP(rsvp,'duration', args.onFrames*1000/c.screen.frameRate, ...
         'isi', args.offFrames*1000/c.screen.frameRate); 
 
