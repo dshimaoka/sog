@@ -153,14 +153,13 @@ pc.addRSVP(rsvp,'duration', args.onFrames*1000/c.screen.frameRate, ...
 f = stimuli.fixation(c,'fixstim');    % Add a fixation stimulus object (named "fix") to the cic. It is born with default values for all parameters.
 f.shape = 'CIRC';               %The seemingly local variable "f" is actually a handle to the stimulus in CIC, so can alter the internal stimulus by modifying "f".
 f.size = 0.25; % units?
-f.color = [1 1 1];
-%f.addProperty('fixDurationRange', fixDurationRange);
-%f.addProperty('fixDuration', []); %should NOT add jitteer to cic. See jitteredITIdemo.m
-%f.fixDuration = plugins.jitter(c, fixDurationRange,'distribution','uniform');
-f.on=0;                         % What time should the stimulus come on? (all times are in ms)
-%f.duration = '@fixbhv.startTime.fixating+fixstim.fixDuration'; % Show spot briefly after fixation acquired
+f.color = 1;
+f.on='@patch1.on';                         % What time should the stimulus come on? (all times are in ms)
 f.X = 0;
 f.Y = 0;
+rsvp =design('rsvp');           % Define a factorial with one factor
+f.addRSVP(rsvp,'duration', args.onFrames*1000/c.screen.frameRate, ...
+        'isi', args.offFrames*1000/c.screen.frameRate); 
 
 
 %% "fixate" for reward...
