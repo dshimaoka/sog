@@ -58,6 +58,15 @@ classdef sog < marmodata.mdbase
             keyPressTime = cell(d.numTrials, 1);
             for itr = 1:d.numTrials
                 [time,trial,frame,keyTmp] = d.meta.keypress.keyIx('trial',itr);
+
+                key = cell2mat(keyTmp);
+                ignoreTrial = isnan(key);
+                keepInd = find(~ignoreTrial);
+                time = time(~ignoreTrial);
+                trial = trial(~ignoreTrial);
+                frame = frame(~ignoreTrial);
+                key = key(~ignoreTrial);
+
                 keyPressTime{itr} = 1e3*(time - t0(itr));
                 if isempty( keyPressTime{itr})
                     keyPressTime{itr} = NaN;
