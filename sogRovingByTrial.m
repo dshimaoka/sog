@@ -238,5 +238,6 @@ end
 
 %% Run the experiment
 % Now tell CIC how we want to run these blocks
+c.subject = args.subject; %params.subj; %'NP';
 c.run(blck);
 end
