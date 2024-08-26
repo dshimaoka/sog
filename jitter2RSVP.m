@@ -1,4 +1,4 @@
-function sogRovingMinimal(varargin)
+function jitter2RSVP(varargin)
 %%
 % rsvp of Gratings with roving design
 %
