@@ -204,6 +204,7 @@ k.maximumRT= Inf;                   %Allow inf time for a response
 k.keys = {'space'};%,'z'};
 k.required = false; %   setting false means that even if this behavior is not successful (i.e. the wrong answer is given), the trial will not be repeated.
 k.successEndsTrial = false;
+k.failEndsTrial = false;
 
 %% Turn off logging
 
