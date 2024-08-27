@@ -38,7 +38,7 @@ classdef sog < marmodata.mdbase
             % d.pReward = getPReward(d);
             % d.rewardTimes = getRewardTimes(d);
 
-            d.keyPressTime = getKeyPressTime(d);
+            %d.keyPressTime = getKeyPressTime(d);
 
         end
 
