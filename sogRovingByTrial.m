@@ -80,6 +80,28 @@ tDur_cycle = (args.onFrames + args.offFrames)*1000/c.screen.frameRate; %one pres
 c.iti = 0;%tDur_cycle;
 c.addProperty('ctrl', args.ctrl);
 
+% c.addProperty('pressedKey',[]);
+% c.addKey('a','behavioural report',1);%,logKeyPress);
+% function logKeyPress(o, key)
+%     disp('a key was pressed');
+%     % log the key press
+%     o.pressedKey = key;
+%     % reset
+%     o.pressedKey = [];
+% end
+c.addScript('KEYBOARD',@logKeyPress, 'a')
+
+function logKeyPress(o, key)
+    disp('a key was pressed');
+    % % log the key press
+    % o.pressedKey = key;
+    % % reset
+    % o.pressedKey = [];
+end
+
+
+
+
 if ~args.debug % log git hash
     hash = marmolab.getGitHash(fileparts(mfilename('fullpath')));
     c.githash('sog.git') = hash;
@@ -172,15 +194,7 @@ rsvp.weights = weightFixation;
 f.addRSVP(rsvp,'duration', args.onFrames*1000/c.screen.frameRate, ...
         'isi', args.offFrames*1000/c.screen.frameRate); 
 
-f.addProperty('pressedKey',[]);
-f.addKey('a','behavioural report',1);%,logKeyPress);
-    % function logKeyPress(o, key)
-    %     disp('a key was pressed');
-    %     % log the key press
-    %     o.pressedKey = key;
-    %     % reset
-    %     o.pressedKey = [];
-    % end
+
 
  %% "fixate" for reward...
 marmolab.behaviors.fixate(c,'fixbhv');
