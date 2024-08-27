@@ -174,13 +174,13 @@ f.addRSVP(rsvp,'duration', args.onFrames*1000/c.screen.frameRate, ...
 
 f.addProperty('pressedKey',[]);
 f.addKey('a','behavioural report',false);%,logKeyPress);
-    function logKeyPress(o, key)
-        disp('a key was pressed');
-        % log the key press
-        o.pressedKey = key;
-        % reset
-        o.pressedKey = [];
-    end
+    % function logKeyPress(o, key)
+    %     disp('a key was pressed');
+    %     % log the key press
+    %     o.pressedKey = key;
+    %     % reset
+    %     o.pressedKey = [];
+    % end
 
  %% "fixate" for reward...
 marmolab.behaviors.fixate(c,'fixbhv');
