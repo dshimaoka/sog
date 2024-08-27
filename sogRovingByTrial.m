@@ -83,15 +83,12 @@ c.addProperty('ctrl', args.ctrl);
 c.addProperty('pressedKey',[]);
 c.addScript('KEYBOARD',@logKeyPress, 'space')
 function logKeyPress(o, key)
-    disp('a key was pressed');
+    %disp('a key was pressed');
     % log the key press
     o.cic.pressedKey = key;
     % reset
     o.cic.pressedKey = [];
 end
-
-
-
 
 if ~args.debug % log git hash
     hash = marmolab.getGitHash(fileparts(mfilename('fullpath')));
@@ -184,6 +181,7 @@ rsvp.fac1.fixstim.color = colorFixation;
 rsvp.weights = weightFixation;
 f.addRSVP(rsvp,'duration', args.onFrames*1000/c.screen.frameRate, ...
         'isi', args.offFrames*1000/c.screen.frameRate); 
+c.fixstim.setChangesInTrial('color');
 
 
 
