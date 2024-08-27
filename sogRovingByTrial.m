@@ -96,7 +96,7 @@ function logKeyPress(o, key)%, time)
     % % log the key press
     o.cic.pressedKey = key;
     % reset
-    o.cic.pressedKey = [];
+    %o.cic.pressedKey = [];
 end
 
 

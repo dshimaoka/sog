@@ -57,7 +57,8 @@ classdef sog < marmodata.mdbase
 
             keyPressTime = cell(d.numTrials, 1);
             for itr = 1:d.numTrials
-                [time,trial,frame,keyTmp] = d.meta.keypress.keyIx('trial',itr);
+                % [time,trial,frame,keyTmp] = d.meta.keypress.keyIx('trial',itr);
+                [time,trial,frame,keyTmp] = d.meta.cic.pressedKey('trial',itr);
 
                 key = cell2mat(keyTmp);
                 ignoreTrial = isnan(key);
