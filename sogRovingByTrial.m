@@ -94,9 +94,9 @@ c.addScript('KEYBOARD',@logKeyPress, 'space')
 function logKeyPress(o, key)%, time)
     disp('a key was pressed');
     % % log the key press
-    o.pressedKey = key;
+    o.cic.pressedKey = key;
     % reset
-    o.pressedKey = [];
+    o.cic.pressedKey = [];
 end
 
 
