@@ -170,7 +170,7 @@ pc.addRSVP(rsvp,'duration', args.onFrames*1000/c.screen.frameRate, ...
 %% Fixation dot
 f = stimuli.fixation(c,'fixstim');    % Add a fixation stimulus object (named "fix") to the cic. It is born with default values for all parameters.
 f.shape = 'CIRC';               %The seemingly local variable "f" is actually a handle to the stimulus in CIC, so can alter the internal stimulus by modifying "f".
-f.size = 0.25; % units?
+f.size = 0.5; % units?
 f.addProperty('colorFixation', colorFixation);
 f.addProperty('weightFixation', weightFixation);
 f.on='@patch1.on';                         % What time should the stimulus come on? (all times are in ms)
