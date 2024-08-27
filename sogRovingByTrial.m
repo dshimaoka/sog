@@ -173,7 +173,7 @@ f.addRSVP(rsvp,'duration', args.onFrames*1000/c.screen.frameRate, ...
         'isi', args.offFrames*1000/c.screen.frameRate); 
 
 f.addProperty('pressedKey',[]);
-f.addKey('a','behavioural report',false,logKeyPress);
+f.addKey('a','behavioural report',false);%,logKeyPress);
     function logKeyPress(o, key)
         disp('a key was pressed');
         % log the key press
