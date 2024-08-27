@@ -60,13 +60,12 @@ classdef sog < marmodata.mdbase
                 % [time,trial,frame,keyTmp] = d.meta.keypress.keyIx('trial',itr);
                 [time,trial,frame,keyTmp] = d.meta.cic.pressedKey('trial',itr);
 
-                key = cell2mat(keyTmp);
-                ignoreTrial = isnan(key);
-                keepInd = find(~ignoreTrial);
-                time = time(~ignoreTrial);
-                trial = trial(~ignoreTrial);
-                frame = frame(~ignoreTrial);
-                key = key(~ignoreTrial);
+                ignoreEntry = cellfun(@isempty, keyTmp);
+                keepInd = find(~ignoreEntry);
+                time = time(~ignoreEntry);
+                trial = trial(~ignoreEntry);
+                frame = frame(~ignoreEntry);
+                key = keyTmp(~ignoreEntry);
 
                 keyPressTime{itr} = 1e3*(time - t0(itr));
                 if isempty( keyPressTime{itr})

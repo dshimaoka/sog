@@ -81,22 +81,13 @@ c.iti = 0;%tDur_cycle;
 c.addProperty('ctrl', args.ctrl);
 
 c.addProperty('pressedKey',[]);
-% c.addKey('a','behavioural report',1);%,logKeyPress);
-% function logKeyPress(o, key)
-%     disp('a key was pressed');
-%     % log the key press
-%     o.pressedKey = key;
-%     % reset
-%     o.pressedKey = [];
-% end
 c.addScript('KEYBOARD',@logKeyPress, 'space')
-
-function logKeyPress(o, key)%, time)
+function logKeyPress(o, key)
     disp('a key was pressed');
-    % % log the key press
+    % log the key press
     o.cic.pressedKey = key;
     % reset
-    %o.cic.pressedKey = [];
+    o.cic.pressedKey = [];
 end
 
 
