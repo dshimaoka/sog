@@ -91,7 +91,7 @@ c.addProperty('ctrl', args.ctrl);
 % end
 c.addScript('KEYBOARD',@logKeyPress, 'a')
 
-function logKeyPress(o, key)
+function logKeyPress(o, key, time)
     disp('a key was pressed');
     % % log the key press
     % o.pressedKey = key;
