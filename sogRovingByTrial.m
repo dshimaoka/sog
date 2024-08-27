@@ -171,7 +171,8 @@ rsvp.fac1.fixstim.color = colorFixation;
 rsvp.weights = weightFixation;
 f.addRSVP(rsvp,'duration', args.onFrames*1000/c.screen.frameRate, ...
         'isi', args.offFrames*1000/c.screen.frameRate); 
-f.addParameter('pressedKey',[]);
+
+f.addProperty('pressedKey',[]);
 f.addKey('a','behavioural report',false,logKeyPress);
     function logKeyPress(o, key)
         % log the key press
