@@ -80,7 +80,7 @@ tDur_cycle = (args.onFrames + args.offFrames)*1000/c.screen.frameRate; %one pres
 c.iti = 0;%tDur_cycle;
 c.addProperty('ctrl', args.ctrl);
 
-% c.addProperty('pressedKey',[]);
+c.addProperty('pressedKey',[]);
 % c.addKey('a','behavioural report',1);%,logKeyPress);
 % function logKeyPress(o, key)
 %     disp('a key was pressed');
