@@ -10,6 +10,7 @@ classdef sog < marmodata.mdbase
         patchStart; %onset times of patch in each trial [ms]
         patchStop; %offset times of patch in each trial [ms]
 
+        
         % reward
         rewardVol;
         rewardRate;
@@ -17,7 +18,9 @@ classdef sog < marmodata.mdbase
         rewardTimes; %time of reward in each trial
 
         % behavioural response
-        keyPressTime; %time when a key is perssed first time in a trial [ms]
+        %oddFixationTime;
+        %keyPressTime; %time when a key is perssed first time in a trial [ms]
+        %reactionTime;
     end
 
     methods (Access = public)
@@ -39,6 +42,8 @@ classdef sog < marmodata.mdbase
             % d.rewardTimes = getRewardTimes(d);
 
             %d.keyPressTime = getKeyPressTime(d);
+            %d.oddFixationTime = getOddFixationTime(d);
+            %d.reactionTime = getReactionTime(d);
 
         end
 
@@ -74,5 +79,57 @@ classdef sog < marmodata.mdbase
             end
 
         end
+
+        function oddFixationTime = getOddFixationTime(d)
+
+        [time, trial, frame, data] = d.meta.fixstim.color; 
+
+        standard = cellfun(@(x)(x(1)==1), data);
+        ignoreEvents = ((frame<0) + standard) > 0;
+        time = time(~ignoreEvents);
+        trial = trial(~ignoreEvents);
+
+         oddFixationTime = cell(d.numTrials, 1);
+         for itr = 1:d.numTrials
+               t0 =  d.meta.cic.firstFrame('trial',itr);
+               theseEvents = find(trial == itr);
+               if ~isempty(time(theseEvents))
+                   oddFixationTime{itr} = 1e3*(time(trial == itr) - t0);
+               else 
+                   oddFixationTime{itr} = NaN;
+               end
+        end
+        
+        end
+
+        function [reactionTime, responseType] = getReactionTime(d)
+         oddFixationTime = d.getOddFixationTime;
+            keyPressTime = d.getKeyPressTime;
+
+            oddFixationTime_all = [];
+            keyPressTime_all = [];
+            for itr = 1:d.numTrials
+                t0 =  d.meta.cic.firstFrame('trial',itr);
+                if ~isnan(oddFixationTime{itr})
+                    oddFixationTime_all = [oddFixationTime_all oddFixationTime{itr}+1e3*t0];
+                end
+                if ~isnan(keyPressTime{itr})
+                    keyPressTime_all = [keyPressTime_all keyPressTime{itr}+1e3*t0];
+                end
+            end
+
+            reactionTime = zeros(numel(oddFixationTime_all),1);
+            for ii = 1:numel(oddFixationTime_all)
+              candidateEvents =  find(keyPressTime_all - oddFixationTime_all(ii) >0);
+              [reactionTime(ii)] = min(keyPressTime_all(candidateEvents) - oddFixationTime_all(ii));
+            end
+            miss = find(reactionTime > 2000);
+            hit = find(reactionTime < 2000);
+            
+            responseType = zeros(numel(oddFixationTime_all),1);
+            responseType(hit) = 1;
+            responseType(miss) = 0;
+        end
+
     end
 end
