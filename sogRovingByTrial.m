@@ -89,7 +89,7 @@ c.addProperty('ctrl', args.ctrl);
 %     % reset
 %     o.pressedKey = [];
 % end
-c.addScript('KEYBOARD',@logKeyPress, 'a')
+c.addScript('KEYBOARD',@(key, time)logKeyPress, 'space')
 
 function logKeyPress(o, key, time)
     disp('a key was pressed');
