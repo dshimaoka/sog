@@ -156,7 +156,7 @@ for ii = 1:nrConds
     
     rsvp.randomization = 'RANDOMWITHOUTREPLACEMENT'; % Randomize
     g{ii}.addRSVP(rsvp,'duration', args.onFrames*1000/c.screen.frameRate, ...
-        'isi', args.offFrames*1000/c.screen.frameRate);%,'log',true); % Tell the stimulus that it should run this rsvp (in every trial). 5 frames on 2 frames off.
+        'isi', args.offFrames*1000/c.screen.frameRate,'log',true); % Tell the stimulus that it should run this rsvp (in every trial). 5 frames on 2 frames off.
 end
 
 pc = stimuli.arc(c,'patchContour');    % Add a fixation stimulus object (named "fix") to the cic. It is born with default values for all parameters.
@@ -225,7 +225,7 @@ stopLog(c.patchContour.prms.disabled);
 stopLog(c.patchContour.prms.filled);
 stopLog(c.patchContour.prms.startTime);
 stopLog(c.patchContour.prms.stopTime);
-stopLog(c.cic.prms.condition);
+% stopLog(c.cic.prms.condition);%THIS IS NECESSARY for mdbase construction
 
 
 
