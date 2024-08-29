@@ -37,7 +37,7 @@ p.addParameter('nRep',3,@(x) validateattributes(x,{'numeric'},{'scalar','nonempt
 p.addParameter('nSuccessivePresentations', [5 10]);
 p.addParameter('onFrames',24);%number of frames per presentation
 p.addParameter('offFrames',6);%number of frames per presentation
-p.addParameter('dirList',0:15:165);%0:30:330);
+p.addParameter('dirList',0:45:315);
 p.addParameter('speed',11, @(x) validateattributes(x,{'numeric'},{'scalar','nonempty'})); %[(visual angle in deg)/s]
 p.addParameter('radius',15, @(x) validateattributes(x,{'numeric'},{'scalar','nonempty'})); %aperture size [deg]
 p.addParameter('ctrl',1, @(x) validateattributes(x,{'numeric'},{'scalar','nonempty'})); 
@@ -78,8 +78,10 @@ c.trialDuration = '@patch1.tDur'; %'@fixbhv.startTime.FIXATING+patch.tDur';
 c.screen.color.background = [0 0 0];
 tDur_cycle = (args.onFrames + args.offFrames)*1000/c.screen.frameRate; %one presentation cycle [ms]
 c.iti = 0;%tDur_cycle;
+c.addProperty('onFrames', args.onFrames);
+c.addProperty('offFrames', args.offFrames);
 c.addProperty('ctrl', args.ctrl);
-
+c.addProperty('dirList', args.dirList);
 c.addProperty('pressedKey',[]);
 c.addScript('KEYBOARD',@logKeyPress, 'space')
 function logKeyPress(o, key)
@@ -154,10 +156,10 @@ for ii = 1:nrConds
     
     rsvp.randomization = 'RANDOMWITHOUTREPLACEMENT'; % Randomize
     g{ii}.addRSVP(rsvp,'duration', args.onFrames*1000/c.screen.frameRate, ...
-        'isi', args.offFrames*1000/c.screen.frameRate); % Tell the stimulus that it should run this rsvp (in every trial). 5 frames on 2 frames off.
+        'isi', args.offFrames*1000/c.screen.frameRate,'log',true); % Tell the stimulus that it should run this rsvp (in every trial). 5 frames on 2 frames off.
 end
 
-pc = stimuli.arc(c,'patchCountour');    % Add a fixation stimulus object (named "fix") to the cic. It is born with default values for all parameters.
+pc = stimuli.arc(c,'patchContour');    % Add a fixation stimulus object (named "fix") to the cic. It is born with default values for all parameters.
 pc.linewidth= 1;               %The seemingly local variable "f" is actually a handle to the stimulus in CIC, so can alter the internal stimulus by modifying "f".
 pc.arcAngle = 360;
 pc.outerRad = args.radius+pc.linewidth;
@@ -211,7 +213,19 @@ end
 
 
 %% Turn off logging
-
+stopLog(c.fixbhv.prms.event);
+stopLog(c.fixbhv.prms.invert);
+stopLog(c.fixbhv.prms.allowBlinks);
+stopLog(c.fixstim.prms.rsvpIsi);
+stopLog(c.fixstim.prms.disabled);
+stopLog(c.fixstim.prms.startTime);
+stopLog(c.fixstim.prms.stopTime);
+stopLog(c.patchContour.prms.rsvpIsi);
+stopLog(c.patchContour.prms.disabled);
+stopLog(c.patchContour.prms.filled);
+stopLog(c.patchContour.prms.startTime);
+stopLog(c.patchContour.prms.stopTime);
+stopLog(c.cic.prms.condition);
 
 
 
