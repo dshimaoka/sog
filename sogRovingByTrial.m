@@ -145,7 +145,7 @@ for ii = 1:nrConds
         g{ii}.phaseSpeed = 360*g{ii}.directionPolarity * args.speed * frequency /g{ii}.frameRate; %[deg/frame]
     end
 
-    stopLog(c.(sprintf('patch%d',ii)).prms.sigma);
+    stopLog(c.(sprintf('patch%d',ii)).prms.sigma); %still recording?
 
 
     % We want to show a rapid rsvp of gratings. Use the factorial class to
@@ -230,7 +230,7 @@ stopLog(c.patchContour.prms.filled);
 stopLog(c.patchContour.prms.startTime);
 stopLog(c.patchContour.prms.stopTime);
 % stopLog(c.cic.prms.condition);%THIS IS NECESSARY for mdbase construction
-stopLog(c.cic.ctrl);
+stopLog(c.cic.prms.ctrl);
 
 
 
