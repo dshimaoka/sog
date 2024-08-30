@@ -230,7 +230,7 @@ stopLog(c.patchContour.prms.filled);
 stopLog(c.patchContour.prms.startTime);
 stopLog(c.patchContour.prms.stopTime);
 % stopLog(c.cic.prms.condition);%THIS IS NECESSARY for mdbase construction
-stopLog(c.cic.prms.ctrl);
+stopLog(c.cic.ctrl);
 
 
 
