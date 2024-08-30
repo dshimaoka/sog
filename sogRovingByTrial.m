@@ -145,9 +145,6 @@ for ii = 1:nrConds
         g{ii}.phaseSpeed = 360*g{ii}.directionPolarity * args.speed * frequency /g{ii}.frameRate; %[deg/frame]
     end
 
-    stopLog(c.(sprintf('patch%d',ii)).prms.sigma); %still recording?
-
-
     % We want to show a rapid rsvp of gratings. Use the factorial class to
     % define these "conditions" in the rsvp.
     rsvp =design('rsvp');           % Define a factorial with one factor
@@ -160,6 +157,9 @@ for ii = 1:nrConds
     rsvp.randomization = 'RANDOMWITHOUTREPLACEMENT'; % Randomize
     g{ii}.addRSVP(rsvp,'duration', args.onFrames*1000/c.screen.frameRate, ...
         'isi', args.offFrames*1000/c.screen.frameRate,'log',true); % Tell the stimulus that it should run this rsvp (in every trial). 5 frames on 2 frames off.
+
+    c.(sprintf('patch%d',ii)).setChangesInTrial('rsvpIsi')
+    stopLog(c.(sprintf('patch%d',ii)).prms.sigma); %still recording?
 end
 
 pc = stimuli.arc(c,'patchContour');    % Add a fixation stimulus object (named "fix") to the cic. It is born with default values for all parameters.
