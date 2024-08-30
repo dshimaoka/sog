@@ -81,6 +81,7 @@ c.iti = 0;%tDur_cycle;
 c.addProperty('onFrames', args.onFrames);
 c.addProperty('offFrames', args.offFrames);
 c.addProperty('ctrl', args.ctrl);
+c.addProperty('nSuccessivePresentations', args.nSuccessivePresentations);
 c.addProperty('dirList', args.dirList);
 c.addProperty('pressedKey',[]);
 c.addScript('KEYBOARD',@logKeyPress, 'space')
@@ -144,6 +145,8 @@ for ii = 1:nrConds
         g{ii}.phaseSpeed = 360*g{ii}.directionPolarity * args.speed * frequency /g{ii}.frameRate; %[deg/frame]
     end
 
+    stopLog(c.(sprintf('patch%d',ii)).prms.sigma);
+
 
     % We want to show a rapid rsvp of gratings. Use the factorial class to
     % define these "conditions" in the rsvp.
@@ -173,6 +176,7 @@ pc.addRSVP(rsvp,'duration', args.onFrames*1000/c.screen.frameRate, ...
 f = stimuli.fixation(c,'fixstim');    % Add a fixation stimulus object (named "fix") to the cic. It is born with default values for all parameters.
 f.shape = 'CIRC';               %The seemingly local variable "f" is actually a handle to the stimulus in CIC, so can alter the internal stimulus by modifying "f".
 f.size = 0.5; % units?
+f.addProperty('probOddFixation', args.probOddFixation);
 f.addProperty('colorFixation', colorFixation);
 f.addProperty('weightFixation', weightFixation);
 f.on='@patch1.on';                         % What time should the stimulus come on? (all times are in ms)
@@ -226,7 +230,7 @@ stopLog(c.patchContour.prms.filled);
 stopLog(c.patchContour.prms.startTime);
 stopLog(c.patchContour.prms.stopTime);
 % stopLog(c.cic.prms.condition);%THIS IS NECESSARY for mdbase construction
-
+stopLog(c.cic.prms.ctrl);
 
 
 
