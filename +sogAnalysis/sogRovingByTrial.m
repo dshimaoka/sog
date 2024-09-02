@@ -12,7 +12,7 @@ classdef sogRovingByTrial < marmodata.mdbase
         onFrames;
         offFrames;
         frameRate;
-        nSuccessivePresentations;
+        nPresentationsRange;
         patchFrequency;
        ctrl; %1: equiprobable. 0: roving 
 
@@ -50,8 +50,8 @@ classdef sogRovingByTrial < marmodata.mdbase
             % % reward
             d.rewardVol = getRewardVol(d);
             d.rewardRate = getRewardRate(d);
-            % d.pReward = getPReward(d);
-            % d.rewardTimes = getRewardTimes(d);
+            d.pReward = getPReward(d);
+            d.rewardTimes = getRewardTimes(d);
 
             %% behaviour
             d.probOddFixation = getProbOddFixation(d);
@@ -61,12 +61,31 @@ classdef sogRovingByTrial < marmodata.mdbase
 
         end
 
-        function rewardVol = getRewardVolume(d)
-            rewardVol = d.meta.fixbhv.rewardVolume('time',Inf).data;
+        function rewardVol = getRewardVol(d)
+            rewardVol = d.meta.fixbhv.rewardVolume.data;
         end
 
         function rewardRate = getRewardRate(d)
-            rewardRate = d.meta.fixbhv.rewardRate('time',Inf).data;
+            rewardRate = d.meta.fixbhv.rewardRate.data;
+        end
+
+        function pReward = getPReward(d)
+            pReward = d.meta.fixbhv.pReward.data;
+        end
+
+        function rewardTime = getRewardTime(d) %from fitKernel/getRewardTimes
+            %not yet tested
+            rewardTime = nan(d.numTrials,1);
+            try
+                for itr = 1:d.numTrials
+                    [time_d, trialInfo, frame, data] = d.meta.newera.item2delivered('trial',itr);
+                    if ~isempty(time_d)
+                        rewardTime(itr) = time_d(end) - d.meta.cic.firstFrame('trial',itr).time;
+                    else
+                        rewardTime(itr) = nan;
+                    end
+                end
+            end
         end
 
         function probOddFixation = getProbOddFixation(d)
@@ -74,7 +93,7 @@ classdef sogRovingByTrial < marmodata.mdbase
         end
 
         function nPresentationsRange = getNPresentationsRange(d)
-            nPresentationsRange = d.meta.cic.nSuccessivePresentations.data;
+            nPresentationsRange = d.meta.cic.nPresentationsRange.data;
         end
 
         function radius = getRadius(d)

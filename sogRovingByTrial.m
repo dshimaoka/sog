@@ -26,10 +26,10 @@ p.KeepUnmatched = true;
 p.addParameter('subject', 'test', @(x) ischar(x));
 p.addParameter('debug',false,@(x) validateattributes(x,{'logical'},{'scalar','nonempty'}));
 
-p.addParameter('nRep',3,@(x) validateattributes(x,{'numeric'},{'scalar','nonempty'}));  % number of sequences
+p.addParameter('nRep',14,@(x) validateattributes(x,{'numeric'},{'scalar','nonempty'}));  % number of sequences
 
 % parameters for rsvp
-p.addParameter('nPresentationsRange', [5 10]);
+p.addParameter('nPresentationsRange', [4 11]);
 p.addParameter('onFrames',24);%number of frames per presentation
 p.addParameter('offFrames',6);%number of frames per presentation
 p.addParameter('dirList',0:45:315);
@@ -61,6 +61,7 @@ numPresentations = args.nRep * numel(args.dirList) * mean(args.nPresentationsRan
 probCtrlFixation = 1 - args.probOddFixation;
 weightFixation = [round(numPresentations * args.probOddFixation) round(numPresentations * probCtrlFixation)];
 
+
 %% Prerequisites.
 import neurostim.*
 commandwindow;
@@ -73,6 +74,9 @@ c.trialDuration = '@patch1.tDur'; %'@fixbhv.startTime.FIXATING+patch.tDur';
 c.screen.color.background = [0 0 0];
 tDur_cycle = (args.onFrames + args.offFrames)*1000/c.screen.frameRate; %one presentation cycle [ms]
 c.iti = 0;
+% expected duration of one sequence
+tDur_sequence = numPresentations * (tDur_cycle + c.iti);
+disp(['Expected duration [s]: ' num2str(tDur_sequence)]);
 c.addProperty('onFrames', args.onFrames);
 c.addProperty('offFrames', args.offFrames);
 c.addProperty('ctrl', args.ctrl);

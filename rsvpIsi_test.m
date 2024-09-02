@@ -1,7 +1,8 @@
 file = 'Z:/Shared/MarmosetData/2024/08/30/test.sogRoving.183738.mat';
 load(file,'c');
 
-%below from nsLoad.m
+%below from marmodata/@mdbase/private/nsdLoad.m
+%plgNames = {'cic' c.pluginOrder.name};
   plg = 'patch1';%plgNames{ii};
   % prms = c.(plg).prms;
   % prmNames = fieldnames(prms); 
