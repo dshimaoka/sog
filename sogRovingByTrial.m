@@ -98,7 +98,7 @@ if ~args.debug % log git hash
     c.githash('sog.git') = hash;
 end
 c.hardware.keyEcho = false;
-
+c.hardware.maxPriorityPerTrial = false;
 
 % Create a Gabor stimulus.
 dirList = args.dirList;
