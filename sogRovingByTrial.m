@@ -97,6 +97,8 @@ if ~args.debug % log git hash
     hash = marmolab.getGitHash(fileparts(mfilename('fullpath')));
     c.githash('sog.git') = hash;
 end
+c.hardware.keyEcho = false;
+
 
 % Create a Gabor stimulus.
 dirList = args.dirList;
