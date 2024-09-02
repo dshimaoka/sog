@@ -13,6 +13,7 @@ classdef sogRovingByTrial < marmodata.mdbase
         offFrames;
         frameRate;
         nSuccessivePresentations;
+        patchFrequency;
        ctrl; %1: equiprobable. 0: roving 
 
         % reward
