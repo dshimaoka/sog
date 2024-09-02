@@ -11,11 +11,6 @@ function sogRovingByTrial(subject, varargin)
 %
 % created from sogDemo
 
-% TODO:
-% control sequence
-% turn off logging
-% impose fixation only in the 1st trial?
-% shorten iti as much as possible
 
 %% PARAMETER DEFINITIONS
 
@@ -34,7 +29,7 @@ p.addParameter('debug',false,@(x) validateattributes(x,{'logical'},{'scalar','no
 p.addParameter('nRep',3,@(x) validateattributes(x,{'numeric'},{'scalar','nonempty'}));  % number of sequences
 
 % parameters for rsvp
-p.addParameter('nSuccessivePresentations', [5 10]);
+p.addParameter('nPresentationsRange', [5 10]);
 p.addParameter('onFrames',24);%number of frames per presentation
 p.addParameter('offFrames',6);%number of frames per presentation
 p.addParameter('dirList',0:45:315);
@@ -62,7 +57,7 @@ redLuminance = 171/255; %Fraser ... Miller 2023
 colorFixation = [.5 1];
 
 %total number of patches presented in a sequence
-numPresentations = args.nRep * numel(args.dirList) * mean(args.nSuccessivePresentations);
+numPresentations = args.nRep * numel(args.dirList) * mean(args.nPresentationsRange);
 probCtrlFixation = 1 - args.probOddFixation;
 weightFixation = [round(numPresentations * args.probOddFixation) round(numPresentations * probCtrlFixation)];
 
@@ -77,11 +72,11 @@ c.addProperty('redLuminance', redLuminance);
 c.trialDuration = '@patch1.tDur'; %'@fixbhv.startTime.FIXATING+patch.tDur';
 c.screen.color.background = [0 0 0];
 tDur_cycle = (args.onFrames + args.offFrames)*1000/c.screen.frameRate; %one presentation cycle [ms]
-c.iti = 0;%tDur_cycle;
+c.iti = 0;
 c.addProperty('onFrames', args.onFrames);
 c.addProperty('offFrames', args.offFrames);
 c.addProperty('ctrl', args.ctrl);
-c.addProperty('nSuccessivePresentations', args.nSuccessivePresentations);
+c.addProperty('nPresentationsRange', args.nPresentationsRange);
 c.addProperty('dirList', args.dirList);
 c.addProperty('pressedKey',[]);
 c.addScript('KEYBOARD',@logKeyPress, 'space')
@@ -121,7 +116,7 @@ for ii = 1:nrConds
     g{ii}.addProperty('directionPolarity',0);
     g{ii}.addProperty('speed',args.speed);
 
-    tDurChoices =  tDur_cycle*args.nSuccessivePresentations(1):tDur_cycle:tDur_cycle*args.nSuccessivePresentations(2);
+    tDurChoices =  tDur_cycle*args.nPresentationsRange(1):tDur_cycle:tDur_cycle*args.nPresentationsRange(2);
     g{ii}.tDur = plugins.jitter(c,num2cell(tDurChoices), 'distribution','1ofN');
 
     g{ii}.color             = 0.5*[redLuminance 0 1 1];
@@ -266,3 +261,15 @@ end
 c.subject = args.subject; %params.subj; %'NP';
 c.run(blck);
 end
+
+%% to check ITI:
+%0.2982 default/c.hardware.keyEcho = false;
+%0.0413 c.hardware.maxPriorityPerTrial = false;
+
+% [time,trial,frame,data]=d.meta.patch1.rsvpIsi;
+% 
+%  iti = [];
+%  for itrial = 1:d.numTrials-1
+%      iti(itrial)  =   min(time(trial==itrial+1)) - max(time(trial==itrial));
+%  end
+%  disp(mean(iti))

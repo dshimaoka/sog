@@ -41,15 +41,15 @@ classdef sogRovingByTrial < marmodata.mdbase
             d.onFrames = getOnFrames(d);
             d.offFrames = getOffFrames(d);
             d.frameRate = getFrameRate(d);
-            %d.patchDir = getPatchDir(d); %direction of patch [deg]
-            d.nSuccessivePresentations = getNSuccessivePresentations(d);
+            d.patchDir = getPatchDir(d); %direction of patch [deg]
+            d.nPresentationsRange = getNPresentationsRange(d);
             d.patchSpeed = getPatchSpeed(d);
             d.patchFrequency = getPatchFrequency(d);
             d.ctrl = getCtrl(d);
 
             % % reward
-            % d.rewardVol = getRewardVol(d);
-            % d.rewardRate = getRewardRate(d);
+            d.rewardVol = getRewardVol(d);
+            d.rewardRate = getRewardRate(d);
             % d.pReward = getPReward(d);
             % d.rewardTimes = getRewardTimes(d);
 
@@ -61,12 +61,20 @@ classdef sogRovingByTrial < marmodata.mdbase
 
         end
 
+        function rewardVol = getRewardVolume(d)
+            rewardVol = d.meta.fixbhv.rewardVolume('time',Inf).data;
+        end
+
+        function rewardRate = getRewardRate(d)
+            rewardRate = d.meta.fixbhv.rewardRate('time',Inf).data;
+        end
+
         function probOddFixation = getProbOddFixation(d)
             probOddFixation = d.meta.fixstim.probOddFixation('time',Inf).data;
         end
 
-        function nSuccessivePresentations = getNSuccessivePresentations(d)
-            nSuccessivePresentations = unique(d.meta.cic.nSuccessivePresentations('time',inf).data);
+        function nPresentationsRange = getNPresentationsRange(d)
+            nPresentationsRange = d.meta.cic.nSuccessivePresentations.data;
         end
 
         function radius = getRadius(d)
@@ -191,12 +199,11 @@ classdef sogRovingByTrial < marmodata.mdbase
             for itr = 1:d.numTrials
                 thisCond = d.condIds(itr);%d.meta.cic.condition('trial',itr).data
 
-                %tDur =
-                %d.meta.(sprintf('patch%d',thisCond)).tDur('time',inf,'trial',itr).data; %INCORRECT
-                nSuccessivePresentations = round(d.tDur(itr) / tDur_cycle);
+                %tDur = d.meta.(sprintf('patch%d',thisCond)).tDur('time',inf,'trial',itr).data; %INCORRECT
+                nPresentations = round(d.tDur(itr) / tDur_cycle);
 
                 if d.meta.cic.ctrl.data == 0
-                     patchDir{itr} = d.patchDirList(thisCond) * ones(nSuccessivePresentations, 1);
+                     patchDir{itr} = d.patchDirList(thisCond) * ones(nPresentations, 1);
                 elseif d.meta.cic.ctrl.data == 1
                     [time,~,frame,data_tmp]  = d.meta.(sprintf('patch%d',thisCond)).direction('trial',itr);
                     okIdx = find(frame>=-1);
@@ -207,8 +214,8 @@ classdef sogRovingByTrial < marmodata.mdbase
 
                     mipi = median(diff(time));
                     
-                    recorded = ones(nSuccessivePresentations,1);
-                    for istim = 1:nSuccessivePresentations-1
+                    recorded = ones(nPresentations,1);
+                    for istim = 1:nPresentations-1
                         try
                             if time(istim+1) - time(istim) > 1.2*mipi
                                 recorded(istim+1) = 0;
@@ -218,7 +225,7 @@ classdef sogRovingByTrial < marmodata.mdbase
                             recorded(istim+1) = 0;
                         end
                     end
-                    data = nan(nSuccessivePresentations,1);
+                    data = nan(nPresentations,1);
                     data(recorded==1) = data_tmp;
                     redundantIdx = find(recorded==0)-1;
                     data(recorded==0) = data(redundantIdx);
