@@ -41,7 +41,7 @@ classdef sogRovingByTrial < marmodata.mdbase
             d.onFrames = getOnFrames(d);
             d.offFrames = getOffFrames(d);
             d.frameRate = getFrameRate(d);
-            d.patchDir = getPatchDir(d); %direction of patch [deg]
+            %d.patchDir = getPatchDir(d); %direction of patch [deg]
             d.nSuccessivePresentations = getNSuccessivePresentations(d);
             d.patchSpeed = getPatchSpeed(d);
             d.patchFrequency = getPatchFrequency(d);
