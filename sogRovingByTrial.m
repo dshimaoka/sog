@@ -161,6 +161,8 @@ for ii = 1:nrConds
 
     c.(sprintf('patch%d',ii)).setChangesInTrial('rsvpIsi')
     stopLog(c.(sprintf('patch%d',ii)).prms.sigma); %still recording?
+
+    c.addScript('BeforeFrame',@(x) dout(x.(sprintf('patch%d',ii)))); % check/set DOUT state before each frame
 end
 
 pc = stimuli.arc(c,'patchContour');    % Add a fixation stimulus object (named "fix") to the cic. It is born with default values for all parameters.
@@ -265,6 +267,31 @@ end
 c.subject = args.subject; %params.subj; %'NP';
 c.run(blck);
 end
+
+%% from marmolab-stimuli/+cuesaccade/opto.m
+function ix = dout(o)
+  % o        - flash stimulus object
+
+  loc_on = o.flags.on;
+  
+  if o.dout == loc_on, return; end
+  
+  if loc_on
+      % DOUT high (LED on?)
+      Datapixx('SetDoutValues',2); Datapixx('RegWrRd');
+  else
+      % DOUT low (LED off?)
+      Datapixx('SetDoutValues',0); Datapixx('RegWrRd');
+  end
+  
+  o.dout = loc_on;
+end
+
+function ip = doff(o)
+    %(LED off?)
+      Datapixx('SetDoutValues',0); Datapixx('RegWrRd');
+end
+
 
 %% to check ITI:
 %0.2982 default/c.hardware.keyEcho = false;
