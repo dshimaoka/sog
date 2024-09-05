@@ -30,8 +30,8 @@ p.addParameter('nRep',14,@(x) validateattributes(x,{'numeric'},{'scalar','nonemp
 
 % parameters for rsvp
 p.addParameter('nPresentationsRange', [4 11]);
-p.addParameter('onFrames',24);%number of frames per presentation
-p.addParameter('offFrames',6);%number of frames per presentation
+p.addParameter('onFrames',48);%number of frames per presentation
+p.addParameter('offFrames',12);%number of frames per presentation
 p.addParameter('dirList',0:45:315);
 p.addParameter('speed',11, @(x) validateattributes(x,{'numeric'},{'scalar','nonempty'})); %[(visual angle in deg)/s]
 p.addParameter('radius',15, @(x) validateattributes(x,{'numeric'},{'scalar','nonempty'})); %aperture size [deg]
