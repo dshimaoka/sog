@@ -162,6 +162,7 @@ for ii = 1:nrConds
     c.(sprintf('patch%d',ii)).setChangesInTrial('rsvpIsi')
     stopLog(c.(sprintf('patch%d',ii)).prms.sigma); %still recording?
 
+    c.(sprintf('patch%d',ii)).addProperty('dout',false); % DOUT state
     c.addScript('BeforeFrame',@(x) dout(x.(sprintf('patch%d',ii)))); % check/set DOUT state before each frame
 end
 
