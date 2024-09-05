@@ -195,6 +195,10 @@ if args.fixOn
     f.addRSVP(rsvp,'duration', args.onFrames*1000/c.screen.frameRate, ...
         'isi', args.offFrames*1000/c.screen.frameRate);
     c.fixstim.setChangesInTrial('color');
+    stopLog(c.fixstim.prms.rsvpIsi);
+    stopLog(c.fixstim.prms.disabled);
+    stopLog(c.fixstim.prms.startTime);
+    stopLog(c.fixstim.prms.stopTime);
 end
 
 
@@ -227,10 +231,6 @@ end
 stopLog(c.fixbhv.prms.event);
 stopLog(c.fixbhv.prms.invert);
 stopLog(c.fixbhv.prms.allowBlinks);
-stopLog(c.fixstim.prms.rsvpIsi);
-stopLog(c.fixstim.prms.disabled);
-stopLog(c.fixstim.prms.startTime);
-stopLog(c.fixstim.prms.stopTime);
 stopLog(c.patchContour.prms.rsvpIsi);
 stopLog(c.patchContour.prms.disabled);
 stopLog(c.patchContour.prms.filled);
