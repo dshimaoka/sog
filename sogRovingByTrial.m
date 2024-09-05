@@ -43,7 +43,7 @@ p.addParameter('rewardRate',0.1,@(x) validateattributes(x,{'numeric'},{'nonempty
 
 % parameters for oddball fixations
 p.addParameter('fixOn',false,@(x) validateattributes(x,{'logical'},{'scalar','nonempty'})); %whether to present a fixation point [logical]
-p.addParameter('probOddFixation', false, @(x) validateattributes(x,{'numeric'},{'nonempty','scalar'})); %probability of dim fixation point  [0-1]
+p.addParameter('probOddFixation', 0.02, @(x) validateattributes(x,{'numeric'},{'nonempty','scalar'})); %probability of dim fixation point  [0-1]
 
 p.parse(subject,varargin{:});
 args = p.Results;
