@@ -42,7 +42,8 @@ p.addParameter('rewardVolume',0.020,@(x) validateattributes(x,{'numeric'},{'none
 p.addParameter('rewardRate',0.1,@(x) validateattributes(x,{'numeric'},{'nonempty','scalar','positive'})); % reward rate (ml/min)
 
 % parameters for oddball fixations
-p.addParameter('probOddFixation', 0, @(x) validateattributes(x,{'numeric'},{'nonempty','scalar'})); %probability of dim fixation point  [0-1]
+p.addParameter('fixOn',false,@(x) validateattributes(x,{'logical'},{'scalar','nonempty'})); %whether to present a fixation point [logical]
+p.addParameter('probOddFixation', false, @(x) validateattributes(x,{'numeric'},{'nonempty','scalar'})); %probability of dim fixation point  [0-1]
 
 p.parse(subject,varargin{:});
 args = p.Results;
@@ -82,6 +83,7 @@ c.addProperty('offFrames', args.offFrames);
 c.addProperty('ctrl', args.ctrl);
 c.addProperty('nPresentationsRange', args.nPresentationsRange);
 c.addProperty('dirList', args.dirList);
+c.addProperty('fixOn', args.fixOn);
 c.addProperty('pressedKey',[]);
 c.addScript('KEYBOARD',@logKeyPress, 'space')
 function logKeyPress(o, key)
@@ -177,22 +179,23 @@ pc.addRSVP(rsvp,'duration', args.onFrames*1000/c.screen.frameRate, ...
         'isi', args.offFrames*1000/c.screen.frameRate); 
 
 %% Fixation dot
-f = stimuli.fixation(c,'fixstim');    % Add a fixation stimulus object (named "fix") to the cic. It is born with default values for all parameters.
-f.shape = 'CIRC';               %The seemingly local variable "f" is actually a handle to the stimulus in CIC, so can alter the internal stimulus by modifying "f".
-f.size = 0.5; % units?
-f.addProperty('probOddFixation', args.probOddFixation);
-f.addProperty('colorFixation', colorFixation);
-f.addProperty('weightFixation', weightFixation);
-f.on='@patch1.on';                         % What time should the stimulus come on? (all times are in ms)
-f.X = 0;
-f.Y = 0;
-rsvp =design('rsvp');           % Define a factorial with one factor
-rsvp.fac1.fixstim.color = colorFixation;
-rsvp.weights = weightFixation;
-f.addRSVP(rsvp,'duration', args.onFrames*1000/c.screen.frameRate, ...
-        'isi', args.offFrames*1000/c.screen.frameRate); 
-c.fixstim.setChangesInTrial('color');
-
+if args.fixOn
+    f = stimuli.fixation(c,'fixstim');    % Add a fixation stimulus object (named "fix") to the cic. It is born with default values for all parameters.
+    f.shape = 'CIRC';               %The seemingly local variable "f" is actually a handle to the stimulus in CIC, so can alter the internal stimulus by modifying "f".
+    f.size = 0.5; % units?
+    f.addProperty('probOddFixation', args.probOddFixation);
+    f.addProperty('colorFixation', colorFixation);
+    f.addProperty('weightFixation', weightFixation);
+    f.on='@patch1.on';                         % What time should the stimulus come on? (all times are in ms)
+    f.X = 0;
+    f.Y = 0;
+    rsvp =design('rsvp');           % Define a factorial with one factor
+    rsvp.fac1.fixstim.color = colorFixation;
+    rsvp.weights = weightFixation;
+    f.addRSVP(rsvp,'duration', args.onFrames*1000/c.screen.frameRate, ...
+        'isi', args.offFrames*1000/c.screen.frameRate);
+    c.fixstim.setChangesInTrial('color');
+end
 
 
  %% "fixate" for reward...
@@ -235,7 +238,10 @@ stopLog(c.patchContour.prms.startTime);
 stopLog(c.patchContour.prms.stopTime);
 % stopLog(c.cic.prms.condition);%THIS IS NECESSARY for mdbase construction
 stopLog(c.cic.prms.ctrl);
-
+stopLog(c.cic.prms.fixOn);
+stopLog(c.cic.prms.onFrames);
+stopLog(c.cic.prms.offFrames);
+stopLog(c.cic.prms.nPresentationsRange);
 
 
 %% Behavioral control
