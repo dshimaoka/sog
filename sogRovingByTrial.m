@@ -162,8 +162,8 @@ for ii = 1:nrConds
     c.(sprintf('patch%d',ii)).setChangesInTrial('rsvpIsi')
     stopLog(c.(sprintf('patch%d',ii)).prms.sigma); %still recording?
 
-    c.(sprintf('patch%d',ii)).addProperty('dout',false); % DOUT state
-    c.addScript('BeforeFrame',@(x) dout(x.(sprintf('patch%d',ii)))); % check/set DOUT state before each frame
+    %c.(sprintf('patch%d',ii)).addProperty('dout',false); % DOUT state
+    %c.addScript('BeforeFrame',@(x) dout(x.(sprintf('patch%d',ii)))); % check/set DOUT state before each frame
 end
 
 pc = stimuli.arc(c,'patchContour');    % Add a fixation stimulus object (named "fix") to the cic. It is born with default values for all parameters.
