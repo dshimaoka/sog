@@ -30,8 +30,8 @@ p.addParameter('nRep',14,@(x) validateattributes(x,{'numeric'},{'scalar','nonemp
 
 % parameters for rsvp
 p.addParameter('nPresentationsRange', [4 11]);
-p.addParameter('onFrames',24);%number of frames per presentation
-p.addParameter('offFrames',6);%number of frames per presentation
+p.addParameter('onFrames',48);%number of frames per presentation
+p.addParameter('offFrames',12);%number of frames per presentation
 p.addParameter('dirList',0:45:315);
 p.addParameter('speed',11, @(x) validateattributes(x,{'numeric'},{'scalar','nonempty'})); %[(visual angle in deg)/s]
 p.addParameter('radius',15, @(x) validateattributes(x,{'numeric'},{'scalar','nonempty'})); %aperture size [deg]
@@ -43,7 +43,7 @@ p.addParameter('rewardRate',0.1,@(x) validateattributes(x,{'numeric'},{'nonempty
 
 % parameters for oddball fixations
 p.addParameter('fixOn',false,@(x) validateattributes(x,{'logical'},{'scalar','nonempty'})); %whether to present a fixation point [logical]
-p.addParameter('probOddFixation', false, @(x) validateattributes(x,{'numeric'},{'nonempty','scalar'})); %probability of dim fixation point  [0-1]
+p.addParameter('probOddFixation', 0.02, @(x) validateattributes(x,{'numeric'},{'nonempty','scalar'})); %probability of dim fixation point  [0-1]
 
 p.parse(subject,varargin{:});
 args = p.Results;
@@ -76,7 +76,7 @@ c.screen.color.background = [0 0 0];
 tDur_cycle = (args.onFrames + args.offFrames)*1000/c.screen.frameRate; %one presentation cycle [ms]
 c.iti = 0;
 % expected duration of one sequence
-tDur_sequence = numPresentations * (tDur_cycle + c.iti);
+tDur_sequence = numPresentations * (tDur_cycle + c.iti) * 1e-3;
 disp(['Expected duration [s]: ' num2str(tDur_sequence)]);
 c.addProperty('onFrames', args.onFrames);
 c.addProperty('offFrames', args.offFrames);
