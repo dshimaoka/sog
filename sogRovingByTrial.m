@@ -11,9 +11,17 @@ function sogRovingByTrial(subject, varargin)
 %
 % created from sogDemo
 
+%% checkout my neurostim branch
+sogDirectory = fileparts(mfilename('fullpath'));
+nsDirectory = strrep(sogDirectory,'sog','neurostim');
+originalHash = marmolab.getGitHash(nsDirectory);
+cd(nsDirectory);
+[~, cmdOutput] = system(sprintf('git show-ref superposition'));
+myHash = cmdOutput(1:40); %myHash = '141539c45b2263844e1e72ed9a4677b3cd19159f';
+system(sprintf('git checkout %s', myHash));
+cd(sogDirectory);
 
 %% PARAMETER DEFINITIONS
-
 if ~exist('subject','var')
     error('No subject name provided. Type ''help facecal'' for usage information.');
 end
@@ -274,6 +282,12 @@ end
 % Now tell CIC how we want to run these blocks
 c.subject = args.subject; %params.subj; %'NP';
 c.run(blck);
+
+%% return to original neurostim branch
+cd(nsDirectory);
+system(sprintf('git checkout %s', originalHash));
+cd(sogDirectory);
+
 end
 
 %% from marmolab-stimuli/+cuesaccade/opto.m
