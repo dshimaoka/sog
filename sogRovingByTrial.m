@@ -16,7 +16,7 @@ sogDirectory = fileparts(mfilename('fullpath'));
 nsDirectory = strrep(sogDirectory,'sog','neurostim');
 originalHash = marmolab.getGitHash(nsDirectory);
 cd(nsDirectory);
-[~, cmdOutput] = system(sprintf('git show-ref superposition'));
+[~, cmdOutput] = system(sprintf('git show-ref superposition-binocular'));
 myHash = cmdOutput(1:40); %myHash = '141539c45b2263844e1e72ed9a4677b3cd19159f';
 system(sprintf('git checkout %s', myHash));
 cd(sogDirectory);
