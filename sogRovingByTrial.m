@@ -280,7 +280,11 @@ end
 
 %% Run the experiment
 % Now tell CIC how we want to run these blocks
-c.subject = args.subject; %params.subj; %'NP';
+c.subject = args.subject;
+
+% load and set eye tracker calibration matrix...
+c.eye.clbMatrix = marmolab.loadCal(c.subject);
+
 c.run(blck);
 
 %% return to original neurostim branch
