@@ -75,6 +75,7 @@ c.trialDuration = '@patch1.tDur'; %'@fixbhv.startTime.FIXATING+patch.tDur';
 c.screen.color.background = [0 0 0];
 tDur_cycle = (args.onFrames + args.offFrames)*1000/c.screen.frameRate; %one presentation cycle [ms]
 c.iti = 0;
+c.saveEveryN = Inf; 
 % expected duration of one sequence
 tDur_sequence = numPresentations * (tDur_cycle + c.iti) * 1e-3;
 disp(['Expected duration [s]: ' num2str(tDur_sequence)]);
