@@ -1,6 +1,10 @@
 classdef sogRovingByTrial < marmodata.mdbase
 
     properties
+        keyReactionWindow = 2000; %temporal window after oddball fixation onset  within which keypress is registered as hit [ms]
+    end
+
+    properties
         % stimulus
         patchDir; %direction of patch [deg]
         radius; %radius of patches in [deg]
@@ -14,7 +18,8 @@ classdef sogRovingByTrial < marmodata.mdbase
         frameRate;
         nPresentationsRange;
         patchFrequency;
-       ctrl; %1: equiprobable. 0: roving 
+        ctrl; %1: equiprobable. 0: roving
+        fixOn; %whether fixation point is presented to divert attention
 
         % reward
         rewardVol;
@@ -24,9 +29,12 @@ classdef sogRovingByTrial < marmodata.mdbase
 
         % behavioural response
         probOddFixation;
-        %oddFixationTime;
-        %keyPressTime; %time when a key is perssed first time in a trial [ms]
-        %reactionTime;
+        oddFixationTime;
+        keyPressTime; %time when a key is perssed first time in a trial [ms]
+        reactionTime;
+
+        % eye movement
+        eye_rm; %eye position after removal of blinks
     end
 
     methods (Access = public)
@@ -36,29 +44,50 @@ classdef sogRovingByTrial < marmodata.mdbase
             d.radius = getRadius(d); %radius of patches in [deg]
             d.patchDirList = getPatchDirList(d); %list of stimulus directions
             d.tDur = getTDur(d); %duration of a sequence [ms]
-            d.patchStart = getPatchStart(d); %onset times of patch
-            % d.patchStop = getPatchStop(d); %offset times of patch
             d.onFrames = getOnFrames(d);
             d.offFrames = getOffFrames(d);
             d.frameRate = getFrameRate(d);
-            d.patchDir = getPatchDir(d); %direction of patch [deg]
             d.nPresentationsRange = getNPresentationsRange(d);
             d.patchSpeed = getPatchSpeed(d);
             d.patchFrequency = getPatchFrequency(d);
             d.ctrl = getCtrl(d);
-
+            d.patchDir = getPatchDir(d); %direction of patch [deg]
+            d.patchStart = getPatchStart(d); %onset times of patch
+            % d.patchStop = getPatchStop(d); %offset times of patch
+            
             % % reward
             d.rewardVol = getRewardVol(d);
             d.rewardRate = getRewardRate(d);
             d.pReward = getPReward(d);
-            d.rewardTimes = getRewardTimes(d);
+            d.rewardTimes = getRewardTime(d);
 
-            %% behaviour
+            %% keypress
+            d.fixOn = getFixOn(d);
             d.probOddFixation = getProbOddFixation(d);
-            %d.keyPressTime = getKeyPressTime(d); %time of key press after trial onset
-            %d.oddFixationTime = getOddFixationTime(d);
-            %d.reactionTime = getReactionTime(d); %time of key press after odd fixation
+            if d.fixOn
+                d.keyPressTime = getKeyPressTime(d); %time of key press after trial onset
+                d.oddFixationTime = getOddFixationTime(d);
+                d.reactionTime = getReactionTime(d); %time of key press after odd fixation
+            end
 
+            %% eye
+            if ~isempty(d.eye)
+                d.eye_rm = rmBlink(d);
+            end
+
+        end
+
+        function eye_rm = rmBlink(d)
+            for itr = 1:d.numTrials
+                eye_rm(itr,1) = d.eye(itr).rmBlinks('dt',median(diff(d.eye(itr).t)), 'duration', 0.01, 'debug', false); %marmodata/+marmodata/@eye/rmBlinks.m
+                %eye_rm(itr,1) = tmp.rmSaccades('debug',false,'sargs',{'accthresh', d.accThresh}); %marmodata/+marmodata/@eye/rmSaccades.m
+                %cf. fitKernel/selectSaccades
+                %close all
+            end
+        end
+
+        function fixOn = getFixOn(d)
+            fixOn = d.meta.cic.fixOn.data;
         end
 
         function rewardVol = getRewardVol(d)
@@ -97,7 +126,7 @@ classdef sogRovingByTrial < marmodata.mdbase
         end
 
         function radius = getRadius(d)
-           radius =  unique(d.meta.patch1.sigma('time',inf).data);
+            radius =  unique(d.meta.patch1.sigma('time',inf).data);
         end
 
         function ctrl = getCtrl(d)
@@ -107,15 +136,15 @@ classdef sogRovingByTrial < marmodata.mdbase
         function tDur = getTDur(d)
             tDur = d.meta.cic.trialDuration('time',Inf).data;
         end
- 
+
         function patchFrequency = getPatchFrequency(d)
             patchFrequency = unique(d.meta.patch1.frequency('time', Inf).data);
         end
- 
+
         function patchSpeed = getPatchSpeed(d)
             patchSpeed = unique(d.meta.patch1.speed('time', Inf).data);
         end
-        
+
         function keyPressTime = getKeyPressTime(d) %FIXME only 1st key press is returned
             %get time of key press from the onset of each trial [ms]
 
@@ -133,7 +162,7 @@ classdef sogRovingByTrial < marmodata.mdbase
                 frame = frame(~ignoreEntry);
                 key = keyTmp(~ignoreEntry);
 
-                keyPressTime{itr} = 1e3*(time - t0(itr));
+                keyPressTime{itr} = (time - t0(itr));
                 if isempty( keyPressTime{itr})
                     keyPressTime{itr} = NaN;
                 end
@@ -143,58 +172,60 @@ classdef sogRovingByTrial < marmodata.mdbase
 
         function oddFixationTime = getOddFixationTime(d)
 
-        [time, trial, frame, data] = d.meta.fixstim.color; 
+            [time, trial, frame, data] = d.meta.fixstim.color;
 
-        standard = cellfun(@(x)(x(1)==1), data);
-        ignoreEvents = ((frame<0) + standard) > 0;
-        time = time(~ignoreEvents);
-        trial = trial(~ignoreEvents);
+            standard = cellfun(@(x)(x(1)==1), data);
+            ignoreEvents = ((frame<0) + standard) > 0;
+            time = time(~ignoreEvents);
+            trial = trial(~ignoreEvents);
 
-         oddFixationTime = cell(d.numTrials, 1);
-         for itr = 1:d.numTrials
-               t0 =  d.meta.cic.firstFrame('trial',itr);
-               theseEvents = find(trial == itr);
-               if ~isempty(time(theseEvents))
-                   oddFixationTime{itr} = 1e3*(time(trial == itr) - t0);
-               else 
-                   oddFixationTime{itr} = NaN;
-               end
-        end
-        
+            oddFixationTime = cell(d.numTrials, 1);
+            for itr = 1:d.numTrials
+                t0 =  d.meta.cic.firstFrame('trial',itr);
+                theseEvents = find(trial == itr);
+                if ~isempty(time(theseEvents))
+                    oddFixationTime{itr} = (time(trial == itr) - t0);
+                else
+                    oddFixationTime{itr} = NaN;
+                end
+            end
+
         end
 
         function [reactionTime, responseType] = getReactionTime(d)
-         oddFixationTime = d.getOddFixationTime;
-            keyPressTime = d.getKeyPressTime;
+            %[reactionTime, responseType] = getReactionTime(d)
+            %reactionTime in [ms]
 
             oddFixationTime_all = [];
             keyPressTime_all = [];
             for itr = 1:d.numTrials
                 t0 =  d.meta.cic.firstFrame('trial',itr);
-                if ~isnan(oddFixationTime{itr})
-                    oddFixationTime_all = [oddFixationTime_all oddFixationTime{itr}+1e3*t0];
+                if ~isnan(d.oddFixationTime{itr})
+                    oddFixationTime_all = [oddFixationTime_all d.oddFixationTime{itr}+t0];
                 end
-                if ~isnan(keyPressTime{itr})
-                    keyPressTime_all = [keyPressTime_all keyPressTime{itr}+1e3*t0];
+                if ~isnan(d.keyPressTime{itr})
+                    keyPressTime_all = [keyPressTime_all d.keyPressTime{itr}+t0];
                 end
             end
 
             reactionTime = zeros(numel(oddFixationTime_all),1);
             for ii = 1:numel(oddFixationTime_all)
-              candidateEvents =  find(keyPressTime_all - oddFixationTime_all(ii) >0);
-              [reactionTime(ii)] = min(keyPressTime_all(candidateEvents) - oddFixationTime_all(ii));
+                candidateEvents =  find(keyPressTime_all - oddFixationTime_all(ii) >0);
+                if ~isempty(candidateEvents)
+                    redactionTime(ii) = 1e3*min(keyPressTime_all(candidateEvents) - oddFixationTime_all(ii));
+                end
             end
-            miss = find(reactionTime > 2000);
-            hit = find(reactionTime < 2000);
-            
+            miss = find(reactionTime > d.keyReactionWindow);
+            hit = find(reactionTime < d.keyReactionWindow);
+
             responseType = zeros(numel(oddFixationTime_all),1);
             responseType(hit) = 1;
             responseType(miss) = 0;
         end
 
         function frameRate = getFrameRate(d)
-             test = d.meta.cic.screen.data(1);
-             frameRate = test{1}.frameRate;
+            test = d.meta.cic.screen.data(1);
+            frameRate = test{1}.frameRate;
         end
 
         function onFrames = getOnFrames(d)
@@ -221,18 +252,13 @@ classdef sogRovingByTrial < marmodata.mdbase
                 %tDur = d.meta.(sprintf('patch%d',thisCond)).tDur('time',inf,'trial',itr).data; %INCORRECT
                 nPresentations = round(d.tDur(itr) / tDur_cycle);
 
-                if d.meta.cic.ctrl.data == 0
-                     patchDir{itr} = d.patchDirList(thisCond) * ones(nPresentations, 1);
-                elseif d.meta.cic.ctrl.data == 1
-                    [time,~,frame,data_tmp]  = d.meta.(sprintf('patch%d',thisCond)).direction('trial',itr);
-                    okIdx = find(frame>=-1);
-
-                    time = time(okIdx);
-                    data_tmp = cell2mat(data_tmp);
-                    data_tmp = data_tmp(okIdx);
+                if d.meta.cic.ctrl.data == 0 %roving
+                    patchDir{itr} = d.patchDirList(thisCond) * ones(1, nPresentations);
+                elseif d.meta.cic.ctrl.data == 1 %random equiprobable
+                    [time, data_tmp] = getRSVP(d, 'direction', itr);
 
                     mipi = median(diff(time));
-                    
+
                     recorded = ones(nPresentations,1);
                     for istim = 1:nPresentations-1
                         try
@@ -244,7 +270,7 @@ classdef sogRovingByTrial < marmodata.mdbase
                             recorded(istim+1) = 0;
                         end
                     end
-                    data = nan(nPresentations,1);
+                    data = nan(1,nPresentations);
                     data(recorded==1) = data_tmp;
                     redundantIdx = find(recorded==0)-1;
                     data(recorded==0) = data(redundantIdx);
@@ -258,19 +284,145 @@ classdef sogRovingByTrial < marmodata.mdbase
         function patchStart = getPatchStart(d)
             %all patch start times from the start of each trial
 
-            patchStart = cell(numel(d.numTrials), 1);
+            patchStart = cell(d.numTrials, 1);
             for itr = 1:d.numTrials
-                thisCond = d.condIds(itr);%d.meta.cic.condition('trial',itr).data
-
                 t0 = d.meta.cic.firstFrame('time',Inf, 'trial',itr); %= d.meta.(sprintf('patch%d',thisCond)).startTime('trial',itr);
-
-                [time,~,frame,data] = d.meta.(sprintf('patch%d',thisCond)).rsvpIsi('trial',itr);
-                data = cell2mat(data);
-                okIdx = find(data==0 & frame>=-1);
-
+                [time, data] = getRSVP(d, 'rsvpIsi', itr);
+                okIdx = data == 0;
                 patchStart{itr} = time(okIdx) - t0;
             end
-
         end
+
+        function fig = showEyePos_cat(d)
+            %show eye position within a sequence
+
+            [eyeData_cat, meta_cat] = sogAnalysis.concatenate_eye(d.eye, d);%d.eye_rm, d);
+
+            fig = figure('position',[0 0 1900 600]);
+            subplot(211);
+            plot(eyeData_cat.t, eyeData_cat.x, 'b', eyeData_cat.t, eyeData_cat.y, 'k');
+         
+            xlim([eyeData_cat.t(1), eyeData_cat.t(end)]);
+            showRange = 1.2*[-d.radius d.radius];
+            ylim(showRange);
+            hline([-d.radius d.radius]);
+            vbox(meta_cat.STARTBLINK, meta_cat.ENDBLINK);
+
+            
+            patchStart_cat = [];
+            patchEnd_cat = [];
+            rewardTimes_cat = [];
+            patchDir_cat = [];
+            oddFixationTime_cat = [];
+            keyPressTime_cat = [];
+            t_cat = [];
+
+            for itr = 1:d.numTrials
+                if isempty(t_cat)
+                    t0 = d.eye(itr).t(1);
+                elseif ~isempty(d.eye(itr).t)
+                    t0 =  max(t_cat)-d.eye(itr).t(1)+d.eye(itr).dt;
+                end
+                if ~isempty(d.eye(itr).t)
+                    t_cat = cat(1, t_cat, d.eye(itr).t+t0);
+                end
+                t_cat = t_cat(~isnan(t_cat));
+                [t_cat, ix] = unique(t_cat);
+
+                patchStart_cat = [patchStart_cat d.patchStart{itr} + t0];
+                patchEnd_cat = [patchEnd_cat d.patchStart{itr}+d.onFrames/d.frameRate + t0]; %HACK
+                rewardTimes_cat = [rewardTimes_cat d.rewardTimes(itr)+ t0];
+                oddFixationTime_cat = [oddFixationTime_cat d.oddFixationTime{itr}+ t0];
+                keyPressTime_cat = [keyPressTime_cat d.keyPressTime{itr}+ t0];
+                patchDir_cat = [patchDir_cat d.patchDir{itr}];
+            end
+
+            %keypress
+            vline(oddFixationTime_cat,gca,'-','c');
+            vline(keyPressTime_cat,gca,'-','r');
+            
+            %reward
+            vline(rewardTimes_cat,gca,'-','g');
+
+            %patch direction
+            dirColor = [hsv(numel(d.patchDirList)) .2*ones(numel(d.patchDirList),1)];
+            [~, patchDirIdx] = ismember(patchDir_cat, d.patchDirList);
+            vbox(patchStart_cat, patchEnd_cat, gca, dirColor(patchDirIdx,:));
+
+            eyeInPatch = sum(sqrt(eyeData_cat.x.^2+eyeData_cat.y.^2) < d.radius)/numel(eyeData_cat.t)*100;
+            title(sprintf('eye within patch: %.1f%%. %d oddfixation(cyan), %d keyResp(red), %d reward(green)', ...
+                eyeInPatch, sum(~isnan(oddFixationTime_cat)), sum(~isnan(keyPressTime_cat)), sum(~isnan(rewardTimes_cat)) ));
+            xlabel('time[s]'); legend('x','y');
+
+            subplot(212);
+            histogram2(eyeData_cat.x, eyeData_cat.y, showRange(1):1:showRange(2),...
+                showRange(1):1:showRange(2), 'FaceColor','flat','DisplayStyle','tile','ShowEmptyBins','on',...
+                'EdgeColor','none');
+            axis square;
+            hold on;
+            viscircles([0,0], d.radius, 'color','k','LineStyle','--')
+
+            hline(0,gca,'','w'); vline(0,gca,'','w');
+        end
+
+        function [dt,complete] = getDuration(d,trialId,varargin)
+            %from
+            %marmolab-stimuli/+tuning/+analysis/oriXrsvp.getDuration
+
+            thisCond = d.condIds(trialId);
+            dt = d.meta.(sprintf('patch%d',thisCond)).stopTime('trial',trialId).time - ...
+                d.meta.(sprintf('patch%d',thisCond)).startTime('trial',trialId).time; % grating duration(s)
+            complete = dt >= d.meta.cic.trialDuration('trial',trialId,'time',Inf).data/1e3 - 10e-6; % ms --> s
+        end
+
+        function [t,val] = getRSVP(d,param,trialId)
+            %from     marmolab-stimuli/+tuning/+analysis/oriXrsvp.getRSVP
+            assert(ischar(param) && ~isempty(param),'You must provide a parameter name.');
+
+
+            scr = d.meta.cic.screen.data; scr = scr{1};
+
+            dt = d.getDuration(trialId);
+            nrFrames = round(dt.*scr.frameRate);
+
+
+            thisCond = d.condIds(trialId);%d.meta.cic.condition('trial',trialIds).data
+
+            firstFrame = d.meta.(sprintf('patch%d',thisCond)).startTime('trial',trialId).time;
+
+            [t,~,~,v] = d.meta.(sprintf('patch%d',thisCond)).(param)('trial',trialId);
+
+            idx = t < firstFrame;
+            if any(idx)
+                % drop entries corresponding to (re-)setting of the default value
+                % between trials
+                idx = t < max(t(idx));
+
+                t(idx) = [];
+                v(idx) = [];
+
+                t(1) = firstFrame; % necessary?
+            else
+                % we end up here if the first value is equal to the default
+                % value, and which happens to equal the last vale on the
+                % previous trial... so we have no t < firstFrame
+                t = [firstFrame, t];
+
+                lastVal = d.meta.(sprintf('patch%d',thisCond)).(param)('trial',trialId-1,'time',Inf).data;
+                v = [lastVal, v];
+            end
+
+            t = [t, d.meta.cic.trialStopTime('trial',trialId).time];
+
+            n = round(diff(t).*scr.frameRate);
+
+            % assert(sum(n) == nrFrames,'Frame count mismatch on trial %i.',trialId);
+            if sum(n) ~= nrFrames
+                warning(['Trial ' num2str(trialId) 'Frame count mismatch']);
+            end
+            val = cell2mat(v);
+            %val = reshape(repelem(cell2mat(v),n),[],1);
+        end
+
     end
 end
