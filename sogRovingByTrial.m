@@ -31,7 +31,7 @@ validateattributes(subject,{'char'},{'nonempty'},'','subject',1);
 % parse optional arguments...
 p = inputParser();
 p.KeepUnmatched = true;
-p.addParameter('subject', 'test', @(x) ischar(x));
+p.addRequired('subject',@(x) validateattributes(x,{'char'},{'nonempty'}));
 p.addParameter('debug',false,@(x) validateattributes(x,{'logical'},{'scalar','nonempty'}));
 
 p.addParameter('nRep',14,@(x) validateattributes(x,{'numeric'},{'scalar','nonempty'}));  % number of sequences
