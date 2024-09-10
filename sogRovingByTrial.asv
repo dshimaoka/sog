@@ -12,16 +12,15 @@ function sogRovingByTrial(subject, varargin)
 % created from sogDemo
 
 %% checkout my neurostim branch
-sogDirectory = fileparts(mfilename('fullpath'));
-nsDirectory = strrep(sogDirectory,'sog','neurostim');
+sogDirectory = fileparts(mfilename('fullpath')),'sog'
+nsDirectory = strrep(sogDirectory,'neurostim');
 originalHash = marmolab.getGitHash(nsDirectory);
 cd(nsDirectory);
-[~, cmdOutput] = system(sprintf('git show-ref superposition-binocular'));
-myHash = cmdOutput(1:40); %myHash = '141539c45b2263844e1e72ed9a4677b3cd19159f';
+myHash = '141539c45b2263844e1e72ed9a4677b3cd19159f';
 system(sprintf('git checkout %s', myHash));
-cd(sogDirectory);
 
 %% PARAMETER DEFINITIONS
+
 if ~exist('subject','var')
     error('No subject name provided. Type ''help facecal'' for usage information.');
 end
@@ -31,7 +30,7 @@ validateattributes(subject,{'char'},{'nonempty'},'','subject',1);
 % parse optional arguments...
 p = inputParser();
 p.KeepUnmatched = true;
-p.addRequired('subject',@(x) validateattributes(x,{'char'},{'nonempty'}));
+p.addParameter('subject', 'test', @(x) ischar(x));
 p.addParameter('debug',false,@(x) validateattributes(x,{'logical'},{'scalar','nonempty'}));
 
 p.addParameter('nRep',14,@(x) validateattributes(x,{'numeric'},{'scalar','nonempty'}));  % number of sequences
@@ -280,17 +279,11 @@ end
 
 %% Run the experiment
 % Now tell CIC how we want to run these blocks
-c.subject = args.subject;
-
-% load and set eye tracker calibration matrix...
-c.eye.clbMatrix = marmolab.loadCal(c.subject);
-
+c.subject = args.subject; %params.subj; %'NP';
 c.run(blck);
 
 %% return to original neurostim branch
-cd(nsDirectory);
 system(sprintf('git checkout %s', originalHash));
-cd(sogDirectory);
 
 end
 

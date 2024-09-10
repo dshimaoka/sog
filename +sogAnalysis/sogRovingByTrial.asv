@@ -19,7 +19,6 @@ classdef sogRovingByTrial < marmodata.mdbase
         nPresentationsRange;
         patchFrequency;
         ctrl; %1: equiprobable. 0: roving
-        fixOn; %whether fixation point is presented to divert attention
 
         % reward
         rewardVol;
@@ -64,7 +63,7 @@ classdef sogRovingByTrial < marmodata.mdbase
             %% keypress
             d.fixOn = getFixOn(d);
             d.probOddFixation = getProbOddFixation(d);
-            if d.fixOn
+            if fixOn
                 d.keyPressTime = getKeyPressTime(d); %time of key press after trial onset
                 d.oddFixationTime = getOddFixationTime(d);
                 d.reactionTime = getReactionTime(d); %time of key press after odd fixation
@@ -162,7 +161,7 @@ classdef sogRovingByTrial < marmodata.mdbase
                 frame = frame(~ignoreEntry);
                 key = keyTmp(~ignoreEntry);
 
-                keyPressTime{itr} = (time - t0(itr));
+                keyPressTime{itr} = 1e3*(time - t0(itr));
                 if isempty( keyPressTime{itr})
                     keyPressTime{itr} = NaN;
                 end
@@ -184,7 +183,7 @@ classdef sogRovingByTrial < marmodata.mdbase
                 t0 =  d.meta.cic.firstFrame('trial',itr);
                 theseEvents = find(trial == itr);
                 if ~isempty(time(theseEvents))
-                    oddFixationTime{itr} = (time(trial == itr) - t0);
+                    oddFixationTime{itr} = 1e3*(time(trial == itr) - t0);
                 else
                     oddFixationTime{itr} = NaN;
                 end
@@ -193,30 +192,28 @@ classdef sogRovingByTrial < marmodata.mdbase
         end
 
         function [reactionTime, responseType] = getReactionTime(d)
-            %[reactionTime, responseType] = getReactionTime(d)
-            %reactionTime in [ms]
+            oddFixationTime = d.getOddFixationTime;
+            keyPressTime = d.getKeyPressTime;
 
             oddFixationTime_all = [];
             keyPressTime_all = [];
             for itr = 1:d.numTrials
                 t0 =  d.meta.cic.firstFrame('trial',itr);
-                if ~isnan(d.oddFixationTime{itr})
-                    oddFixationTime_all = [oddFixationTime_all d.oddFixationTime{itr}+t0];
+                if ~isnan(oddFixationTime{itr})
+                    oddFixationTime_all = [oddFixationTime_all oddFixationTime{itr}+1e3*t0];
                 end
-                if ~isnan(d.keyPressTime{itr})
-                    keyPressTime_all = [keyPressTime_all d.keyPressTime{itr}+t0];
+                if ~isnan(keyPressTime{itr})
+                    keyPressTime_all = [keyPressTime_all keyPressTime{itr}+1e3*t0];
                 end
             end
 
             reactionTime = zeros(numel(oddFixationTime_all),1);
             for ii = 1:numel(oddFixationTime_all)
                 candidateEvents =  find(keyPressTime_all - oddFixationTime_all(ii) >0);
-                if ~isempty(candidateEvents)
-                    redactionTime(ii) = 1e3*min(keyPressTime_all(candidateEvents) - oddFixationTime_all(ii));
-                end
+                [reactionTime(ii)] = min(keyPressTime_all(candidateEvents) - oddFixationTime_all(ii));
             end
-            miss = find(reactionTime > d.keyReactionWindow);
-            hit = find(reactionTime < d.keyReactionWindow);
+            miss = find(reactionTime > keyReactionWindow);
+            hit = find(reactionTime < keyReactionWindow);
 
             responseType = zeros(numel(oddFixationTime_all),1);
             responseType(hit) = 1;
@@ -300,21 +297,20 @@ classdef sogRovingByTrial < marmodata.mdbase
 
             fig = figure('position',[0 0 1900 600]);
             subplot(211);
-            plot(eyeData_cat.t, eyeData_cat.x, 'b', eyeData_cat.t, eyeData_cat.y, 'k');
-         
+            plot(eyeData_cat.t, eyeData_cat.x, eyeData_cat.t, eyeData_cat.y);
+
             xlim([eyeData_cat.t(1), eyeData_cat.t(end)]);
             showRange = 1.2*[-d.radius d.radius];
             ylim(showRange);
             hline([-d.radius d.radius]);
             vbox(meta_cat.STARTBLINK, meta_cat.ENDBLINK);
 
-            
+            vline()
+
             patchStart_cat = [];
             patchEnd_cat = [];
             rewardTimes_cat = [];
             patchDir_cat = [];
-            oddFixationTime_cat = [];
-            keyPressTime_cat = [];
             t_cat = [];
 
             for itr = 1:d.numTrials
@@ -331,27 +327,17 @@ classdef sogRovingByTrial < marmodata.mdbase
 
                 patchStart_cat = [patchStart_cat d.patchStart{itr} + t0];
                 patchEnd_cat = [patchEnd_cat d.patchStart{itr}+d.onFrames/d.frameRate + t0]; %HACK
-                rewardTimes_cat = [rewardTimes_cat d.rewardTimes(itr)+ t0];
-                oddFixationTime_cat = [oddFixationTime_cat d.oddFixationTime{itr}+ t0];
-                keyPressTime_cat = [keyPressTime_cat d.keyPressTime{itr}+ t0];
+                rewardTimes_cat = [rewardTimes_cat d.rewardTimes(itr)];
                 patchDir_cat = [patchDir_cat d.patchDir{itr}];
             end
 
-            %keypress
-            vline(oddFixationTime_cat,gca,'-','c');
-            vline(keyPressTime_cat,gca,'-','r');
-            
-            %reward
             vline(rewardTimes_cat,gca,'-','g');
-
-            %patch direction
-            dirColor = [hsv(numel(d.patchDirList)) .2*ones(numel(d.patchDirList),1)];
+            dirColor = [hsv(numel(d.patchDirList)) .5*ones(numel(d.patchDirList),1)];
             [~, patchDirIdx] = ismember(patchDir_cat, d.patchDirList);
             vbox(patchStart_cat, patchEnd_cat, gca, dirColor(patchDirIdx,:));
 
             eyeInPatch = sum(sqrt(eyeData_cat.x.^2+eyeData_cat.y.^2) < d.radius)/numel(eyeData_cat.t)*100;
-            title(sprintf('eye within patch: %.1f%%. %d oddfixation(cyan), %d keyResp(red), %d reward(green)', ...
-                eyeInPatch, sum(~isnan(oddFixationTime_cat)), sum(~isnan(keyPressTime_cat)), sum(~isnan(rewardTimes_cat)) ));
+            title(sprintf('eye within patch: %.1f%%', eyeInPatch));
             xlabel('time[s]'); legend('x','y');
 
             subplot(212);
@@ -359,9 +345,6 @@ classdef sogRovingByTrial < marmodata.mdbase
                 showRange(1):1:showRange(2), 'FaceColor','flat','DisplayStyle','tile','ShowEmptyBins','on',...
                 'EdgeColor','none');
             axis square;
-            hold on;
-            viscircles([0,0], d.radius, 'color','k','LineStyle','--')
-
             hline(0,gca,'','w'); vline(0,gca,'','w');
         end
 
