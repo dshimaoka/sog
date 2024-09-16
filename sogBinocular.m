@@ -109,7 +109,7 @@ if ii == 1
 elseif ii == 2
     g{ii}.color             = 0.5*[0 0 1 1];
 end
-    g{ii}.contrast          = iff(isinf(sprintf('patch%d',ii).direction), 0, 1);
+    g{ii}.contrast          = iff(isinf(patch1.direction), 0, 1);
     g{ii}.Y                 = 0;
     g{ii}.X                 = 0;
     g{ii}.width = 2*args.radius;
@@ -127,7 +127,7 @@ end
     
     % We want to show a rapid rsvp of gratings. Use the factorial class to
     % define these "conditions" in the rsvp.
-    rsvp =　design('rsvp');           % Define a factorial with one factor
+    rsvp = design('rsvp');           % Define a factorial with one factor
     rsvp.fac1.(sprintf('%s',stimName)).direction = args.dirList; %use all directions
     
     rsvp.randomization = 'RANDOMWITHOUTREPLACEMENT'; % Randomize
