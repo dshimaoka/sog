@@ -109,7 +109,7 @@ if ii == 1
 elseif ii == 2
     g{ii}.color             = 0.5*[0 0 1 1];
 end
-    g{ii}.contrast          = '@iff(isinf(patch1.direction), 0, 1)';
+    g{ii}.contrast          = '@iff(isinf((stimName).direction), 0, 1)';
     g{ii}.Y                 = 0;
     g{ii}.X                 = 0;
     g{ii}.width = 2*args.radius;
