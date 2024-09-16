@@ -121,8 +121,8 @@ end
     g{ii}.mask              = 'CIRCLE';
     g{ii}.frequency         = frequency;
     g{ii}.on                =  0;
-        g{ii}.orientation = '@iff(isinf(patch1.direction), 0, mod(patch1.direction, 180) - 90)';
-        g{ii}.directionPolarity = '@iff(isinf(patch1.direction), 1, -2*fix(patch1.direction/180) + 1)';
+        g{ii}.orientation = '@mod(patch1.direction, 180) - 90';
+        g{ii}.directionPolarity = '@iff(isinf(patch1.direction), 0, -2*fix(patch1.direction/180) + 1)';
         g{ii}.phaseSpeed = '@360*patch1.directionPolarity * patch1.speed * patch1.frequency /patch1.frameRate'; %[deg/frame]
     
     % We want to show a rapid rsvp of gratings. Use the factorial class to
