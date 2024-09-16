@@ -121,9 +121,9 @@ for ii = 1:nrConds
     g{ii}.mask              = 'CIRCLE';
     g{ii}.frequency         = frequency;
     g{ii}.on                =  0;
-    g{ii}.orientation = '@iff(isinf(patch1.direction), 0, mod(patch1.direction, 180) - 90)';
-    g{ii}.directionPolarity = '@iff(isinf(patch1.direction), 1, -2*fix(patch1.direction/180) + 1)';
-    g{ii}.phaseSpeed = '@360*patch1.directionPolarity * patch1.speed * patch1.frequency /patch1.frameRate'; %[deg/frame]
+    g{ii}.orientation = sprintf('@iff(isinf(patch%d.direction), 0, mod(patch%d.direction, 180) - 90)', ii, ii);
+    g{ii}.directionPolarity = sprintf('@iff(isinf(patch%d.direction), 1, -2*fix(patch%d.direction/180) + 1)', ii, ii);
+    g{ii}.phaseSpeed = sprintf('@360*patch%d.directionPolarity * patch%d.speed * patch%d.frequency /patch%d.frameRate', ii, ii, ii,ii); %[deg/frame]
     
     % We want to show a rapid rsvp of gratings. Use the factorial class to
     % define these "conditions" in the rsvp.
