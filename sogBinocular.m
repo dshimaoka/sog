@@ -52,7 +52,7 @@ frequency = 0.5; %spatial frequency in cycles per visual angle in degree (not pi
 redLuminance = 128/255; %Fraser ... Miller 2023
 
 %patch contour
-contourWidth  = 10; %pixels? 
+contourWidth  = 10; %pixels?
 
 %total number of patches presented in a sequence
 numPresentations = args.nRep * numel(args.dirList) * args.nPresentations;
@@ -70,7 +70,7 @@ c.trialDuration = '@patch1.tDur'; %'@fixbhv.startTime.FIXATING+patch.tDur';
 c.screen.color.background = [0 0 0];
 tDur_cycle = (args.onFrames + args.offFrames)*1000/c.screen.frameRate; %one presentation cycle [ms]
 c.iti = 0;
-c.saveEveryN = Inf; 
+c.saveEveryN = Inf;
 % expected duration of one sequence
 tDur_sequence = numPresentations * (tDur_cycle + c.iti) * 1e-3;
 disp(['Expected duration [s]: ' num2str(tDur_sequence)]);
@@ -95,20 +95,20 @@ for ii = 1:nrConds
     stimName = ['patch' num2str(ii)];
     g{ii} = neurostim.stimuli.gabor(c,stimName); % neurostim.stimuli.gabor
     thisDirection = dirList(ii);
-
+    
     g{ii}.addProperty('tDur', 0); %duration of one successive presentations [ms]
     g{ii}.addProperty('frameRate', c.screen.frameRate);
     g{ii}.addProperty('direction',0);
     g{ii}.addProperty('directionPolarity',0);
     g{ii}.addProperty('speed',args.speed);
-
+    
     g{ii}.tDur = tDur_cycle*args.nPresentations;
-
-if ii == 1
-    g{ii}.color             = 0.5*[redLuminance 0 0 1];
-elseif ii == 2
-    g{ii}.color             = 0.5*[0 0 1 1];
-end
+    
+    if ii == 1
+        g{ii}.color             = 0.5*[redLuminance 0 0 1];
+    elseif ii == 2
+        g{ii}.color             = 0.5*[0 0 1 1];
+    end
     g{ii}.contrast          = '@iff(isinf(patch1.direction), 0, 1)';%'@iff(isinf((stimName).direction), 0, 1)';
     g{ii}.Y                 = 0;
     g{ii}.X                 = 0;
@@ -121,9 +121,9 @@ end
     g{ii}.mask              = 'CIRCLE';
     g{ii}.frequency         = frequency;
     g{ii}.on                =  0;
-        g{ii}.orientation = '@mod(patch1.direction, 180) - 90';
-        g{ii}.directionPolarity = '@iff(isinf(patch1.direction), 0, -2*fix(patch1.direction/180) + 1)';
-        g{ii}.phaseSpeed = '@360*patch1.directionPolarity * patch1.speed * patch1.frequency /patch1.frameRate'; %[deg/frame]
+    g{ii}.orientation = '@iff(isinf(patch1.direction), 0, mod(patch1.direction, 180) - 90)';
+    g{ii}.directionPolarity = '@iff(isinf(patch1.direction), 1, -2*fix(patch1.direction/180) + 1)';
+    g{ii}.phaseSpeed = '@360*patch1.directionPolarity * patch1.speed * patch1.frequency /patch1.frameRate'; %[deg/frame]
     
     % We want to show a rapid rsvp of gratings. Use the factorial class to
     % define these "conditions" in the rsvp.
@@ -133,9 +133,9 @@ end
     rsvp.randomization = 'RANDOMWITHOUTREPLACEMENT'; % Randomize
     g{ii}.addRSVP(rsvp,'duration', args.onFrames*1000/c.screen.frameRate, ...
         'isi', args.offFrames*1000/c.screen.frameRate,'log',true);
-
+    
     c.(sprintf('patch%d',ii)).setChangesInTrial('rsvpIsi')
-    stopLog(c.(sprintf('patch%d',ii)).prms.sigma); 
+    stopLog(c.(sprintf('patch%d',ii)).prms.sigma);
 end
 
 
@@ -150,11 +150,11 @@ pc.color = [1 1 1];
 pc.on = '@patch1.on';
 rsvp =design('rsvp');           % Define a factorial with one factor
 pc.addRSVP(rsvp,'duration', args.onFrames*1000/c.screen.frameRate, ...
-        'isi', args.offFrames*1000/c.screen.frameRate); 
+    'isi', args.offFrames*1000/c.screen.frameRate);
 
 
 
- %% "fixate" for reward...
+%% "fixate" for reward...
 marmolab.behaviors.fixate(c,'fixbhv');
 c.fixbhv.on = 0;
 c.fixbhv.from = '@fixbhv.startTime.fixating';
@@ -231,7 +231,7 @@ end
 %0.0413 c.hardware.maxPriorityPerTrial = false;
 
 % [time,trial,frame,data]=d.meta.patch1.rsvpIsi;
-% 
+%
 %  iti = [];
 %  for itrial = 1:d.numTrials-1
 %      iti(itrial)  =   min(time(trial==itrial+1)) - max(time(trial==itrial));
