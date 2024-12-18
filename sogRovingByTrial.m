@@ -42,7 +42,7 @@ p.addParameter('onFrames',48);%number of frames per presentation
 p.addParameter('offFrames',12);%number of frames per presentation
 p.addParameter('dirList',0:45:315);
 p.addParameter('speed',11, @(x) validateattributes(x,{'numeric'},{'scalar','nonempty'})); %[(visual angle in deg)/s]
-p.addParameter('radius',15, @(x) validateattributes(x,{'numeric'},{'scalar','nonempty'})); %aperture size [deg]
+p.addParameter('radius',14, @(x) validateattributes(x,{'numeric'},{'scalar','nonempty'})); %aperture size [deg]
 p.addParameter('ctrl',1, @(x) validateattributes(x,{'numeric'},{'scalar','nonempty'})); 
 
 % parameters for reward
@@ -62,8 +62,8 @@ args = p.Results;
 % fixDuration = 300; % [ms] minimum duration of fixation to initiate patch stimuli
 %iti = 1000; %[ms] inter trial interval
 frequency = 0.5; %spatial frequency in cycles per visual angle in degree (not pixel) %Kapoor 2022
-redLuminance = 171/255; %Fraser ... Miller 2023
-colorFixation = [.5 1];
+contourWidth  = 10; %patch contour
+redLuminance = 128/255; 
 
 %total number of patches presented in a sequence
 numPresentations = args.nRep * numel(args.dirList) * mean(args.nPresentationsRange);
@@ -81,6 +81,12 @@ c.paradigm = 'sogRoving';
 c.addProperty('redLuminance', redLuminance);
 c.trialDuration = '@patch1.tDur'; %'@fixbhv.startTime.FIXATING+patch.tDur';
 c.screen.color.background = [0 0 0];
+c.screen.overlayClut(4,:)=0; %do NOT show grids in subject screen
+c.screen.overlayClut(2,:)=0; %do NOT show eye position in console screen
+c.screen.overlayClut(9,:)=1; %show eye position in console screen
+c.eye.useRawData = true; %must be true to use clbMatrix 
+c.hardware.keyEcho = false; %false
+
 tDur_cycle = (args.onFrames + args.offFrames)*1000/c.screen.frameRate; %one presentation cycle [ms]
 c.iti = 0;
 c.saveEveryN = Inf; 
@@ -177,10 +183,12 @@ for ii = 1:nrConds
     %c.addScript('BeforeFrame',@(x) dout(x.(sprintf('patch%d',ii)))); % check/set DOUT state before each frame
 end
 
-pc = stimuli.arc(c,'patchContour');    % Add a fixation stimulus object (named "fix") to the cic. It is born with default values for all parameters.
-pc.linewidth= 1;               %The seemingly local variable "f" is actually a handle to the stimulus in CIC, so can alter the internal stimulus by modifying "f".
-pc.arcAngle = 360;
-pc.outerRad = args.radius+pc.linewidth;
+pc = stimuli.convPoly(c, 'patchContour');
+pc.filled = false;
+pc.nSides = 32;
+pc.radius = args.radius;
+pc.linewidth = contourWidth;
+pc.preCalc = false;
 pc.color = [1 1 1];
 pc.on = '@patch1.on';
 rsvp =design('rsvp');           % Define a factorial with one factor
@@ -191,7 +199,7 @@ pc.addRSVP(rsvp,'duration', args.onFrames*1000/c.screen.frameRate, ...
 if args.fixOn
     f = stimuli.fixation(c,'fixstim');    % Add a fixation stimulus object (named "fix") to the cic. It is born with default values for all parameters.
     f.shape = 'CIRC';               %The seemingly local variable "f" is actually a handle to the stimulus in CIC, so can alter the internal stimulus by modifying "f".
-    f.size = 0.5; % units?
+    f.size = 2;
     f.addProperty('probOddFixation', args.probOddFixation);
     f.addProperty('colorFixation', colorFixation);
     f.addProperty('weightFixation', weightFixation);
@@ -199,7 +207,7 @@ if args.fixOn
     f.X = 0;
     f.Y = 0;
     rsvp =design('rsvp');           % Define a factorial with one factor
-    rsvp.fac1.fixstim.color = colorFixation;
+    rsvp.fac1.fixstim.color = [1 1 1];
     rsvp.weights = weightFixation;
     f.addRSVP(rsvp,'duration', args.onFrames*1000/c.screen.frameRate, ...
         'isi', args.offFrames*1000/c.screen.frameRate);
