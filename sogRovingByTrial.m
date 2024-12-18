@@ -201,7 +201,7 @@ if args.fixOn
     f.shape = 'CIRC';               %The seemingly local variable "f" is actually a handle to the stimulus in CIC, so can alter the internal stimulus by modifying "f".
     f.size = 2;
     f.addProperty('probOddFixation', args.probOddFixation);
-    f.addProperty('colorFixation', colorFixation);
+    %f.addProperty('colorFixation', colorFixation);
     f.addProperty('weightFixation', weightFixation);
     f.on='@patch1.on';                         % What time should the stimulus come on? (all times are in ms)
     f.X = 0;
