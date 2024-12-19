@@ -52,6 +52,7 @@ p.addParameter('rewardRate',0.1,@(x) validateattributes(x,{'numeric'},{'nonempty
 % parameters for oddball fixations
 p.addParameter('fixOn',false,@(x) validateattributes(x,{'logical'},{'scalar','nonempty'})); %whether to present a fixation point [logical]
 %p.addParameter('probOddFixation', 0.02, @(x) validateattributes(x,{'numeric'},{'nonempty','scalar'})); %probability of dim fixation point  [0-1]
+p.addParameter('blueLuminance',1); %blue luminance in grating [0 - 1]
 
 p.parse(subject,varargin{:});
 args = p.Results;
@@ -60,7 +61,7 @@ args = p.Results;
 % radius_init = 2;%initial fixation radius[deg] value from OcuFol and cueSaccade
 % fixationDeadline = 5000; %[ms]
 % fixDuration = 300; % [ms] minimum duration of fixation to initiate patch stimuli
-iti = 1000; %[ms] inter trial interval
+% iti = 1000; %[ms] inter trial interval
 frequency = 0.5; %spatial frequency in cycles per visual angle in degree (not pixel) %Kapoor 2022
 contourWidth  = 10; %patch contour
 redLuminance = 128/255; 
@@ -89,7 +90,7 @@ c.eye.useRawData = true; %must be true to use clbMatrix
 c.hardware.keyEcho = false; %false
 
 tDur_cycle = (args.onFrames + args.offFrames)*1000/c.screen.frameRate; %one presentation cycle [ms]
-c.iti = iti;
+c.iti = 0;
 c.saveEveryN = Inf; 
 % expected duration of one sequence
 tDur_sequence = numPresentations * (tDur_cycle + c.iti) * 1e-3;
@@ -101,6 +102,7 @@ c.addProperty('nPresentationsRange', args.nPresentationsRange);
 c.addProperty('dirList', args.dirList);
 c.addProperty('fixOn', args.fixOn);
 c.addProperty('pressedKey',[]);
+c.addProperty('blueLuminance', args.blueLuminance);
 c.addScript('KEYBOARD',@logKeyPress, 'space')
 function logKeyPress(o, key)
     %disp('a key was pressed');
@@ -141,7 +143,7 @@ for ii = 1:nrConds
     tDurChoices =  tDur_cycle*args.nPresentationsRange(1):tDur_cycle:tDur_cycle*args.nPresentationsRange(2);
     g{ii}.tDur = plugins.jitter(c,num2cell(tDurChoices), 'distribution','1ofN');
 
-    g{ii}.color             = 0.5*[redLuminance 0 1 1];
+    g{ii}.color             = 0.5*[redLuminance 0 blueLuminance 1];
     g{ii}.contrast          = contrast;
     g{ii}.Y                 = 0;
     g{ii}.X                 = 0;
