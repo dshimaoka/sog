@@ -143,7 +143,7 @@ for ii = 1:nrConds
     tDurChoices =  tDur_cycle*args.nPresentationsRange(1):tDur_cycle:tDur_cycle*args.nPresentationsRange(2);
     g{ii}.tDur = plugins.jitter(c,num2cell(tDurChoices), 'distribution','1ofN');
 
-    g{ii}.color             = 0.5*[redLuminance 0 blueLuminance 1];
+    g{ii}.color             = 0.5*[redLuminance 0 args.blueLuminance 1];
     g{ii}.contrast          = contrast;
     g{ii}.Y                 = 0;
     g{ii}.X                 = 0;
