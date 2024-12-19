@@ -51,7 +51,7 @@ p.addParameter('rewardRate',0.1,@(x) validateattributes(x,{'numeric'},{'nonempty
 
 % parameters for oddball fixations
 p.addParameter('fixOn',false,@(x) validateattributes(x,{'logical'},{'scalar','nonempty'})); %whether to present a fixation point [logical]
-p.addParameter('probOddFixation', 0.02, @(x) validateattributes(x,{'numeric'},{'nonempty','scalar'})); %probability of dim fixation point  [0-1]
+%p.addParameter('probOddFixation', 0.02, @(x) validateattributes(x,{'numeric'},{'nonempty','scalar'})); %probability of dim fixation point  [0-1]
 
 p.parse(subject,varargin{:});
 args = p.Results;
@@ -67,8 +67,8 @@ redLuminance = 128/255;
 
 %total number of patches presented in a sequence
 numPresentations = args.nRep * numel(args.dirList) * mean(args.nPresentationsRange);
-probCtrlFixation = 1 - args.probOddFixation;
-weightFixation = [round(numPresentations * args.probOddFixation) round(numPresentations * probCtrlFixation)];
+%probCtrlFixation = 1 - args.probOddFixation;
+%weightFixation = [round(numPresentations * args.probOddFixation) round(numPresentations * probCtrlFixation)];
 
 
 %% Prerequisites.
@@ -202,17 +202,17 @@ if args.fixOn
     f.size = 2;
     f.addProperty('probOddFixation', args.probOddFixation);
     %f.addProperty('colorFixation', colorFixation);
-    f.addProperty('weightFixation', weightFixation);
+    %f.addProperty('weightFixation', weightFixation);
     f.on='@patch1.on';                         % What time should the stimulus come on? (all times are in ms)
     f.X = 0;
     f.Y = 0;
-    rsvp =design('rsvp');           % Define a factorial with one factor
-    rsvp.fac1.fixstim.color = [1 1 1];
-    rsvp.weights = weightFixation;
-    f.addRSVP(rsvp,'duration', args.onFrames*1000/c.screen.frameRate, ...
-        'isi', args.offFrames*1000/c.screen.frameRate);
-    c.fixstim.setChangesInTrial('color');
-    stopLog(c.fixstim.prms.rsvpIsi);
+    %     rsvp =design('rsvp');           % Define a factorial with one factor
+    %     rsvp.fac1.fixstim.color = [1 1 1];
+    %     rsvp.weights = weightFixation;
+    %     f.addRSVP(rsvp,'duration', args.onFrames*1000/c.screen.frameRate, ...
+    %         'isi', args.offFrames*1000/c.screen.frameRate);
+    %     c.fixstim.setChangesInTrial('color');
+    %     stopLog(c.fixstim.prms.rsvpIsi);
     stopLog(c.fixstim.prms.disabled);
     stopLog(c.fixstim.prms.startTime);
     stopLog(c.fixstim.prms.stopTime);
