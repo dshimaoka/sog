@@ -64,6 +64,7 @@ args = p.Results;
 frequency = 0.5; %spatial frequency in cycles per visual angle in degree (not pixel) %Kapoor 2022
 contourWidth  = 10; %patch contour
 redLuminance = 128/255; 
+contrast = 0.5;
 
 %total number of patches presented in a sequence
 numPresentations = args.nRep * numel(args.dirList) * mean(args.nPresentationsRange);
@@ -141,7 +142,7 @@ for ii = 1:nrConds
     g{ii}.tDur = plugins.jitter(c,num2cell(tDurChoices), 'distribution','1ofN');
 
     g{ii}.color             = 0.5*[redLuminance 0 1 1];
-    g{ii}.contrast          = 1;
+    g{ii}.contrast          = contrast;
     g{ii}.Y                 = 0;
     g{ii}.X                 = 0;
     g{ii}.width = 2*args.radius;
@@ -299,6 +300,10 @@ c.run(blck);
 cd(nsDirectory);
 system(sprintf('git checkout %s', originalHash));
 cd(sogDirectory);
+
+if ~args.debug
+    quit; %to reduce missed frames in the next experiment
+end
 
 end
 
