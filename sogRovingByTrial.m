@@ -200,7 +200,7 @@ if args.fixOn
     f = stimuli.fixation(c,'fixstim');    % Add a fixation stimulus object (named "fix") to the cic. It is born with default values for all parameters.
     f.shape = 'CIRC';               %The seemingly local variable "f" is actually a handle to the stimulus in CIC, so can alter the internal stimulus by modifying "f".
     f.size = 2;
-    f.addProperty('probOddFixation', args.probOddFixation);
+    %f.addProperty('probOddFixation', args.probOddFixation);
     %f.addProperty('colorFixation', colorFixation);
     %f.addProperty('weightFixation', weightFixation);
     f.on='@patch1.on';                         % What time should the stimulus come on? (all times are in ms)
