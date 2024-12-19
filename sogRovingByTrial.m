@@ -60,7 +60,7 @@ args = p.Results;
 % radius_init = 2;%initial fixation radius[deg] value from OcuFol and cueSaccade
 % fixationDeadline = 5000; %[ms]
 % fixDuration = 300; % [ms] minimum duration of fixation to initiate patch stimuli
-%iti = 1000; %[ms] inter trial interval
+iti = 1000; %[ms] inter trial interval
 frequency = 0.5; %spatial frequency in cycles per visual angle in degree (not pixel) %Kapoor 2022
 contourWidth  = 10; %patch contour
 redLuminance = 128/255; 
@@ -89,7 +89,7 @@ c.eye.useRawData = true; %must be true to use clbMatrix
 c.hardware.keyEcho = false; %false
 
 tDur_cycle = (args.onFrames + args.offFrames)*1000/c.screen.frameRate; %one presentation cycle [ms]
-c.iti = 0;
+c.iti = iti;
 c.saveEveryN = Inf; 
 % expected duration of one sequence
 tDur_sequence = numPresentations * (tDur_cycle + c.iti) * 1e-3;

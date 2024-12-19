@@ -63,7 +63,7 @@ classdef sogRovingByTrial < marmodata.mdbase
 
             %% keypress
             d.fixOn = getFixOn(d);
-            d.probOddFixation = getProbOddFixation(d);
+            %d.probOddFixation = getProbOddFixation(d);
             if d.fixOn
                 d.keyPressTime = getKeyPressTime(d); %time of key press after trial onset
                 d.oddFixationTime = getOddFixationTime(d);
