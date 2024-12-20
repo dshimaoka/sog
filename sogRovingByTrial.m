@@ -65,7 +65,7 @@ args = p.Results;
 frequency = 0.5; %spatial frequency in cycles per visual angle in degree (not pixel) %Kapoor 2022
 contourWidth  = 10; %patch contour
 redLuminance = 128/255; 
-contrast = 0.5;
+contrast = 1;
 
 %total number of patches presented in a sequence
 numPresentations = args.nRep * numel(args.dirList) * mean(args.nPresentationsRange);
